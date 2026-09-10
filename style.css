@@ -1,0 +1,538 @@
+/* ============================================================================
+   In stile russo — стили.
+   Порядок: токены → сброс → типографика → кнопки → блоки сверху вниз →
+   планшет/десктоп в самом конце.
+   Верстка мобильная: базовые правила написаны под экран 360 px,
+   медиазапросы только расширяют.
+   ============================================================================ */
+
+/* --- 1. Токены: цвета, шрифты, размеры ----------------------------------- */
+
+:root {
+  --ink: #101318;        /* текст и тёмные экраны */
+  --paper: #f2f4f7;      /* фон страницы */
+  --white: #ffffff;      /* плашки, поля формы */
+  --kub: #1f2e6e;        /* кубовая синь: кнопки, ссылки, акцент */
+  --kub-pale: #c7d0e8;   /* линии, паттерн */
+  --muted: #5a6270;      /* второстепенный текст */
+
+  --wrap: 1120px;
+  --gap: 20px;
+  --radius: 8px;
+
+  --font-display: 'Unbounded', 'Trebuchet MS', system-ui, sans-serif;
+  --font-text: 'Golos Text', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  color-scheme: light;
+}
+
+/* --- 2. Сброс ------------------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;             /* страховка от горизонтального скролла */
+  touch-action: manipulation;      /* убирает задержку двойного тапа */
+  -webkit-tap-highlight-color: rgba(31, 46, 110, .15);
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+ul, ol { margin: 0; padding: 0; list-style: none; }
+
+[hidden] { display: none !important; }
+
+p { margin: 0 0 1em; }
+
+h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 600; line-height: 1.1; text-wrap: balance; }
+
+:target { scroll-margin-top: 84px; }
+
+/* --- 3. Доступность ------------------------------------------------------- */
+
+/* Видимый фокус на всём, что можно нажать с клавиатуры */
+:focus-visible {
+  outline: 3px solid var(--kub);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+/* На тёмных экранах синяя обводка не видна — делаем светлую */
+.hero :focus-visible,
+.section--ink :focus-visible,
+.footer :focus-visible { outline-color: var(--white); }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute; left: 8px; top: -60px; z-index: 100;
+  padding: 12px 16px; border-radius: var(--radius);
+  background: var(--white); color: var(--kub);
+  font-weight: 600; text-decoration: none;
+  transition: top 150ms ease;
+}
+.skip-link:focus-visible { top: 8px; }
+
+/* --- 4. Сетка ------------------------------------------------------------- */
+
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding-inline: var(--gap);
+}
+
+.section { padding-block: 48px; }
+.section--paper { background: var(--white); }
+.section--ink { background: var(--ink); color: var(--paper); }
+
+.section__title { font-size: clamp(26px, 7vw, 40px); }
+.section__intro { max-width: 62ch; color: var(--muted); }
+.section--ink .section__intro { color: var(--kub-pale); }
+.section__note { margin-top: 24px; font-size: 14px; color: var(--muted); }
+.section--ink .section__note { color: var(--kub-pale); }
+
+.subtitle {
+  margin-top: 40px;
+  font-family: var(--font-text);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* --- 5. Кнопки и ссылки --------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;              /* палец попадает без промаха */
+  padding: 14px 26px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--kub);
+  color: var(--white);
+  font-family: var(--font-text);
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+.btn:hover { background: #172354; }
+.btn:active { background: #121c44; }
+
+/* На тёмном фоне синяя кнопка сливается — выворачиваем наизнанку */
+.hero .btn--primary,
+.section--ink .btn--primary { background: var(--paper); color: var(--ink); }
+.hero .btn--primary:hover,
+.section--ink .btn--primary:hover { background: var(--white); }
+
+.btn--compact { min-height: 44px; padding: 10px 18px; font-size: 15px; }
+
+.btn--outline {
+  background: transparent;
+  border: 1.5px solid var(--kub-pale);
+  color: var(--paper);
+}
+.btn--outline:hover { background: rgba(255, 255, 255, .1); }
+
+.link-underline {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+}
+.link-underline:hover { text-decoration-thickness: 3px; }
+
+/* --- 6. Шапка ------------------------------------------------------------- */
+
+.header {
+  position: sticky; top: 0; z-index: 40;
+  background: rgba(16, 19, 24, .96);
+  color: var(--paper);
+}
+.header__inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 10px var(--gap);
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;                /* палец должен попадать по ссылке */
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: -.01em;
+  color: var(--paper);
+  text-decoration: none;
+  margin-right: auto;
+}
+.nav { display: none; }               /* на телефоне меню прячем, есть липкая кнопка */
+.nav__list { display: flex; gap: 22px; }
+.nav__list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--kub-pale);
+  font-size: 15px;
+  text-decoration: none;
+}
+.nav__list a:hover { color: var(--white); text-decoration: underline; text-underline-offset: 4px; }
+
+/* --- 7. Первый экран ------------------------------------------------------ */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--paper);
+  padding-block: 40px 48px;
+  padding-inline: var(--gap);
+}
+
+/* Паттерн кубовой набойки. Единственная анимация на сайте:
+   слой один раз «прокатывается» слева направо, как набивная доска по ткани. */
+.hero__pattern {
+  position: absolute;
+  inset: 0;
+  opacity: .1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M36 9c6 8 6 13 0 21-6-8-6-13 0-21z'/%3E%3Cpath d='M36 63c6-8 6-13 0-21-6 8-6 13 0 21z'/%3E%3Cpath d='M9 36c8 6 13 6 21 0-8-6-13-6-21 0z'/%3E%3Cpath d='M63 36c-8 6-13 6-21 0 8-6 13-6 21 0z'/%3E%3Ccircle cx='36' cy='36' r='3.5'/%3E%3Cpath d='M0 0l5 5-5 5-5-5z'/%3E%3Cpath d='M72 0l5 5-5 5-5-5z'/%3E%3Cpath d='M0 72l5 5-5 5-5-5z'/%3E%3Cpath d='M72 72l5 5-5 5-5-5z'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 72px 72px;
+  transform: translate3d(-100%, 0, 0);
+  animation: print 900ms cubic-bezier(.16, .84, .44, 1) 120ms both;
+}
+@keyframes print { to { transform: translate3d(0, 0, 0); } }
+
+.hero__inner { position: relative; max-width: var(--wrap); margin: 0 auto; }
+
+.hero__title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(30px, 8.5vw, 66px);
+  line-height: 1.04;
+  letter-spacing: -.02em;
+  margin-bottom: 20px;
+}
+.hero__subtitle {
+  max-width: 46ch;
+  font-size: 17px;
+  color: var(--kub-pale);
+  margin-bottom: 28px;
+}
+.hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 22px; }
+.hero__actions .btn { flex: 1 1 auto; min-width: 220px; }
+
+.hero__figure { margin: 36px 0 0; }
+/* Маска-арка: та же форма, что у наличника. Второй этнический элемент. */
+.hero__photo {
+  width: 100%;
+  border-radius: 50% 50% var(--radius) var(--radius) / 26% 26% var(--radius) var(--radius);
+  object-fit: cover;
+  aspect-ratio: 4 / 3;
+}
+
+/* --- 8. Форматы ----------------------------------------------------------- */
+
+.formats { margin-top: 28px; }
+
+.format {
+  padding-block: 22px;
+  border-top: 1px solid var(--kub-pale);
+}
+.format:last-child { border-bottom: 1px solid var(--kub-pale); }
+
+.format__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+}
+.format__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.format__price {
+  font-weight: 600;
+  color: var(--kub);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.format__what { margin: 8px 0 12px; }
+
+.format__meta { display: grid; gap: 6px; margin: 0; }
+.format__meta dt {
+  font-size: 13px;
+  color: var(--muted);
+}
+.format__meta dd { margin: 0 0 6px; font-size: 15px; }
+
+/* --- 9. Репертуар --------------------------------------------------------- */
+
+.repertoire { display: grid; gap: 32px; margin-top: 28px; }
+
+.rep__name {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 600;
+  margin: 0 0 10px;
+  padding-top: 16px;
+  border-top: 4px solid var(--kub);
+  display: inline-block;
+}
+.rep__text { margin-bottom: 10px; }
+.rep__examples { font-size: 15px; color: var(--muted); margin: 0; }
+.rep__examples b { font-weight: 600; color: var(--ink); }
+
+/* --- 10. Видео, аудио, фото ----------------------------------------------- */
+
+.video { margin-top: 24px; }
+.video-row { display: grid; gap: 16px; margin-top: 16px; }
+
+.video__btn {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: var(--ink);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  aspect-ratio: 16 / 9;
+}
+.video__poster { width: 100%; height: 100%; object-fit: cover; opacity: .82; transition: opacity 160ms ease; }
+.video__btn:hover .video__poster { opacity: 1; }
+
+.video__play {
+  position: absolute;
+  left: 50%; top: 50%;
+  translate: -50% -50%;
+  width: 64px; height: 64px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--kub);
+}
+.video__play svg { width: 22px; height: 22px; margin-left: 3px; }
+
+.video__caption { margin: 8px 0 0; font-size: 14px; color: var(--muted); }
+
+.video iframe, .audio iframe {
+  width: 100%;
+  border: 0;
+  border-radius: var(--radius);
+  display: block;
+}
+.video iframe { aspect-ratio: 16 / 9; height: auto; }
+
+.audio { margin-top: 12px; }
+.audio__note, .media__empty {
+  padding: 16px;
+  border: 1.5px dashed var(--kub-pale);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: 15px;
+  margin: 0;
+}
+/* На тёмном фоне серый текст не читается */
+.section--ink .media__empty { color: var(--kub-pale); }
+
+/* Лента фотографий: на телефоне листается вбок */
+.photos {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  padding-bottom: 8px;
+}
+.photos li { flex: 0 0 76%; scroll-snap-align: start; }
+.photos img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+/* --- 11. Отзывы ----------------------------------------------------------- */
+
+.reviews { display: grid; gap: 28px; margin-top: 28px; }
+
+.review {
+  margin: 0;                       /* у blockquote есть свой отступ, он тут лишний */
+  border-left: 3px solid var(--kub);
+  padding-left: 18px;
+}
+.review__text { margin-bottom: 10px; }
+.review__author { margin: 0; font-weight: 600; }
+.review__role { margin: 0; font-size: 14px; color: var(--muted); }
+
+/* --- 12. О дуэте ---------------------------------------------------------- */
+
+.about { display: grid; gap: 28px; }
+.about__lead { font-size: 19px; }
+
+.credentials { margin: 24px 0 0; }
+.credentials dt { font-size: 13px; color: var(--muted); }
+.credentials dd { margin: 2px 0 14px; }
+
+.about__photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+/* --- 13. Контакты и форма ------------------------------------------------- */
+
+.contacts__buttons { display: grid; gap: 12px; margin: 28px 0 8px; }
+.contacts__buttons .btn { width: 100%; }
+
+.form-block { margin-top: 40px; }
+.form { display: grid; gap: 4px; max-width: 520px; }
+.form__row { display: grid; gap: 6px; margin: 0 0 16px; }
+.form__label { font-size: 15px; font-weight: 600; }
+.form__hint { font-size: 13px; color: var(--kub-pale); }
+
+.form__input {
+  min-height: 52px;
+  padding: 12px 14px;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: 16px;                 /* меньше 16px — iOS зумит страницу */
+  width: 100%;
+}
+.form__input:hover { border-color: var(--kub-pale); }
+.form__input[aria-invalid="true"] { border-color: #b03030; }
+
+.form__error { margin: 0; font-size: 14px; color: #ffb4b4; }
+.form__submit { margin-top: 8px; width: 100%; }
+.form__status { margin: 12px 0 0; min-height: 1.6em; font-size: 15px; }
+
+.social { margin-top: 44px; }
+.social__list { display: flex; flex-wrap: wrap; gap: 10px 20px; }
+.social__list a { color: var(--kub-pale); }
+
+/* --- 14. Подвал ----------------------------------------------------------- */
+
+.footer {
+  background: var(--ink);
+  color: var(--kub-pale);
+  padding-block: 32px;
+  font-size: 15px;
+}
+.footer__inner p { margin: 0 0 6px; }
+.footer__brand { font-family: var(--font-display); font-weight: 600; color: var(--paper); }
+.footer__copy { font-variant-numeric: tabular-nums; }
+
+/* --- 15. Липкая кнопка связи ---------------------------------------------- */
+
+.sticky {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 50;
+  background: var(--white);
+  border-top: 1px solid var(--kub-pale);
+  padding: 10px var(--gap) calc(10px + env(safe-area-inset-bottom));
+}
+.sticky__inner { display: flex; gap: 10px; max-width: var(--wrap); margin: 0 auto; }
+.sticky .btn { flex: 1 1 auto; }
+.sticky .btn--icon {
+  flex: 0 0 auto;
+  width: 52px;
+  padding: 0;
+  background: var(--paper);
+  color: var(--kub);
+  border: 1.5px solid var(--kub-pale);
+}
+.sticky .btn--icon:hover { background: var(--kub-pale); }
+.sticky .btn--icon svg { width: 22px; height: 22px; }
+
+/* Пока панель видна, добавляем воздух внизу страницы,
+   чтобы она не накрывала последний блок и фокус на нём. */
+body.has-sticky { padding-bottom: 84px; }
+
+/* --- 16. Уважение к настройке «меньше движения» --------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hero__pattern { animation: none; transform: none; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+/* --- 17. Планшет ---------------------------------------------------------- */
+
+@media (min-width: 700px) {
+  .section { padding-block: 72px; }
+  .hero { padding-block: 64px 72px; }
+
+  .hero__actions .btn { flex: 0 0 auto; }
+  .hero__photo { aspect-ratio: 16 / 9; }
+
+  .video-row { grid-template-columns: 1fr 1fr; }
+  .photos { display: grid; grid-template-columns: repeat(3, 1fr); overflow: visible; }
+  .photos li { flex: none; }
+
+  .repertoire { grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .reviews { grid-template-columns: repeat(3, 1fr); }
+  .contacts__buttons { grid-template-columns: repeat(2, 1fr); }
+  .contacts__buttons .btn { width: auto; }
+
+  .format__head { flex-wrap: nowrap; }
+  .format__meta { grid-template-columns: repeat(3, 1fr); gap: 6px 24px; }
+
+  .about { grid-template-columns: 1.2fr 1fr; align-items: start; gap: 40px; }
+  .credentials { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 20px; }
+}
+
+/* --- 18. Десктоп ---------------------------------------------------------- */
+
+@media (min-width: 1000px) {
+  body { font-size: 17px; }
+
+  .nav { display: block; }
+  .header__inner { padding-block: 14px; }
+  .brand { font-size: 17px; }
+
+  .hero { padding-block: 80px 96px; }
+  .hero__inner { display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; align-items: center; }
+  .hero__figure { margin: 0; }
+  .hero__photo { aspect-ratio: 3 / 4; }
+
+  /* Липкая панель нужна только там, где нет шапки под рукой */
+  .sticky { display: none; }
+  body.has-sticky { padding-bottom: 0; }
+
+  .form { max-width: 560px; }
+}

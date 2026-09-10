@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Замените {{АДРЕС_САЙТА}} на адрес сайта, например https://instilerusso.ru
+Sitemap: {{АДРЕС_САЙТА}}/sitemap.xml
