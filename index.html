@@ -35,8 +35,16 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600&family=Unbounded:wght@600;800&display=swap">
 <link rel="stylesheet" href="style.css">
 
-<!-- Тексты. Подключены до разметки, чтобы страница сразу рисовалась с ними. -->
-<script src="content.js"></script>
+<!-- Тексты и логика. defer: браузер сначала разбирает всю разметку,
+     затем сразу выполняет оба файла — до первой отрисовки, поэтому
+     страница не успевает мелькнуть пустой. -->
+<script src="content.js" defer></script>
+<script src="script.js" defer></script>
+
+<!-- Страховка: без скриптов или при ошибке в них страница всё равно
+     показывается, просто без подставленных текстов. -->
+<noscript><style>body { visibility: visible !important; }</style></noscript>
+<script>setTimeout(function () { document.documentElement.classList.add('ready'); }, 2000);</script>
 
 <script type="application/ld+json">
 {
@@ -88,6 +96,9 @@
           <a class="btn btn--primary" href="#contacts" data-text="cta"></a>
           <a class="link-underline hero__video-link" href="#media" data-text="hero.secondaryLink"></a>
         </div>
+        <!-- Струны гуслей. В покое каждая дуга сплющена в прямую линию;
+             при щипке распрямляется и затухает. Только transform: scaleY. -->
+        <div class="strings" id="strings" aria-hidden="true"></div>
       </div>
       <figure class="hero__figure">
         <img class="hero__photo" id="hero-photo" alt="" decoding="async" fetchpriority="high">
@@ -106,7 +117,7 @@
   </section>
 
   <!-- РЕПЕРТУАР -->
-  <section class="section section--paper" id="repertoire">
+  <section class="section section--paper reveal reveal--stagger" id="repertoire">
     <div class="wrap">
       <h2 class="section__title" data-text="repertoire.title"></h2>
       <p class="section__intro" data-text="repertoire.intro"></p>
@@ -116,7 +127,7 @@
   </section>
 
   <!-- ВИДЕО, АУДИО, ФОТО -->
-  <section class="section" id="media">
+  <section class="section reveal" id="media">
     <div class="wrap">
       <h2 class="section__title" data-text="media.title"></h2>
       <p class="section__intro" data-text="media.videoNote"></p>
@@ -133,7 +144,7 @@
   </section>
 
   <!-- ОТЗЫВЫ -->
-  <section class="section section--paper" id="reviews">
+  <section class="section section--paper reveal" id="reviews">
     <div class="wrap">
       <h2 class="section__title" data-text="reviews.title"></h2>
       <div class="reviews" id="reviews-list"></div>
@@ -209,7 +220,6 @@
   <nav class="sticky__inner" aria-label="" data-attr-aria-label="ui.stickyLabel" id="sticky-inner"></nav>
 </div>
 
-<script src="script.js"></script>
 
 <!-- ===========================================================================
      ЯНДЕКС.МЕТРИКА.

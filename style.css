@@ -8,6 +8,19 @@
 
 /* --- 1. Токены: цвета, шрифты, размеры ----------------------------------- */
 
+/* Подменный шрифт на те доли секунды, пока грузится Unbounded.
+   Unbounded заметно шире системных гротесков, поэтому заголовок на нём
+   занимает на две строки больше. Без подгонки страница дёргалась бы вниз
+   в момент подмены (сдвиг вёрстки 0.88 при допустимых 0.1).
+   Коэффициент 145% подобран так, чтобы заголовок занимал ровно столько же
+   строк, сколько на настоящем шрифте — проверено на 390, 768 и 1280 px. */
+@font-face {
+  font-family: 'Unbounded fallback';
+  src: local('Arial'), local('Liberation Sans'), local('Helvetica'), local('Roboto');
+  size-adjust: 145%;
+  font-display: swap;
+}
+
 :root {
   --ink: #101318;        /* текст и тёмные экраны */
   --paper: #f2f4f7;      /* фон страницы */
@@ -20,11 +33,18 @@
   --gap: 20px;
   --radius: 8px;
 
-  --font-display: 'Unbounded', 'Trebuchet MS', system-ui, sans-serif;
+  --font-display: 'Unbounded', 'Unbounded fallback', 'Trebuchet MS', system-ui, sans-serif;
   --font-text: 'Golos Text', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   color-scheme: light;
 }
+
+/* Тексты подставляет скрипт, поэтому долю секунды разметка пуста.
+   Прячем её на это время: иначе страница успевает нарисоваться пустой,
+   а потом резко вырастает — поисковики считают это дефектом.
+   Класс ready ставится скриптом; если скрипты выключены или сломались,
+   страницу открывают запасные правила в index.html. */
+html:not(.ready) body { visibility: hidden; }
 
 /* --- 2. Сброс ------------------------------------------------------------- */
 
@@ -209,18 +229,65 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   padding-inline: var(--gap);
 }
 
-/* Паттерн кубовой набойки. Единственная анимация на сайте:
-   слой один раз «прокатывается» слева направо, как набивная доска по ткани. */
+/* Паттерн кубовой набойки — статичный фон первого экрана. */
 .hero__pattern {
   position: absolute;
   inset: 0;
   opacity: .1;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M36 9c6 8 6 13 0 21-6-8-6-13 0-21z'/%3E%3Cpath d='M36 63c6-8 6-13 0-21-6 8-6 13 0 21z'/%3E%3Cpath d='M9 36c8 6 13 6 21 0-8-6-13-6-21 0z'/%3E%3Cpath d='M63 36c-8 6-13 6-21 0 8-6 13-6 21 0z'/%3E%3Ccircle cx='36' cy='36' r='3.5'/%3E%3Cpath d='M0 0l5 5-5 5-5-5z'/%3E%3Cpath d='M72 0l5 5-5 5-5-5z'/%3E%3Cpath d='M0 72l5 5-5 5-5-5z'/%3E%3Cpath d='M72 72l5 5-5 5-5-5z'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 72px 72px;
-  transform: translate3d(-100%, 0, 0);
-  animation: print 900ms cubic-bezier(.16, .84, .44, 1) 120ms both;
 }
-@keyframes print { to { transform: translate3d(0, 0, 0); } }
+
+/* --- 7a. Струны гуслей — главный приём -----------------------------------
+   Каждая струна нарисована дугой, но в покое сплющена по вертикали
+   почти до прямой линии. Щипок распрямляет дугу и гасит её
+   колебания. Двигается только transform, вёрстка не пересчитывается.
+   Толщина линии не тянется за масштабом благодаря non-scaling-stroke. */
+
+.strings {
+  margin-top: 32px;
+  max-width: 420px;
+  /* Место под шесть струн занято заранее: скрипт добавляет их после
+     загрузки, и без этой высоты страница дёрнулась бы вниз. */
+  min-height: 144px;
+}
+
+.string {
+  display: flex;
+  align-items: flex-end;
+  height: 24px;                    /* зона попадания курсора и пальца */
+  cursor: pointer;
+}
+.string svg {
+  width: 100%;
+  height: 20px;
+  display: block;
+  overflow: visible;
+  /* Почти ноль, но не ноль: при scaleY(0) матрица вырождается
+     и браузер перестаёт рисовать элемент целиком. */
+  transform: scaleY(.04);
+  transform-origin: bottom center;
+}
+.string path {
+  fill: none;
+  stroke: var(--kub-pale);
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+  opacity: .72;
+  transition: opacity 170ms ease;
+}
+.string:hover path { opacity: 1; }
+
+.string.is-plucked svg { animation: pluck 880ms cubic-bezier(.3, .55, .35, 1) both; }
+
+@keyframes pluck {
+  0%   { transform: scaleY(1); }
+  20%  { transform: scaleY(-.58); }
+  42%  { transform: scaleY(.32); }
+  62%  { transform: scaleY(-.17); }
+  80%  { transform: scaleY(.07); }
+  100% { transform: scaleY(.04); }
+}
 
 .hero__inner { position: relative; max-width: var(--wrap); margin: 0 auto; }
 
@@ -306,6 +373,50 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 .rep__examples { font-size: 15px; color: var(--muted); margin: 0; }
 .rep__examples b { font-weight: 600; color: var(--ink); }
 
+/* Прослушивание сэмпла. Полоса прогресса тянется через scaleX,
+   а не через width — ширина заставила бы браузер пересчитывать вёрстку. */
+.sample { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
+
+.sample__btn {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 1.5px solid var(--kub);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--kub);
+  font-family: var(--font-text);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 170ms ease, color 170ms ease, border-color 170ms ease;
+}
+.sample__btn:hover { background: var(--kub); color: var(--white); }
+.sample__btn[disabled] {
+  border-color: var(--kub-pale);
+  color: var(--muted);
+  cursor: default;
+}
+.sample__btn[disabled]:hover { background: transparent; color: var(--muted); }
+.sample__btn[aria-pressed="true"] { background: var(--kub); color: var(--white); }
+
+.sample__track {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--kub-pale);
+  overflow: hidden;
+}
+.sample__bar {
+  height: 100%;
+  background: var(--kub);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 260ms linear;
+}
+.sample__note { font-size: 14px; color: var(--muted); margin: 0; }
+
 /* --- 10. Видео, аудио, фото ----------------------------------------------- */
 
 .video { margin-top: 24px; }
@@ -329,13 +440,15 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 .video__play {
   position: absolute;
   left: 50%; top: 50%;
-  translate: -50% -50%;
+  translate: -50% -50%;             /* отдельно от transform, чтобы hover им не мешал */
   width: 64px; height: 64px;
   display: grid; place-items: center;
   border-radius: 50%;
   background: var(--white);
   color: var(--kub);
+  transition: transform 180ms ease;
 }
+.video__btn:hover .video__play { transform: scale(1.05); }
 .video__play svg { width: 22px; height: 22px; margin-left: 3px; }
 
 .video__caption { margin: 8px 0 0; font-size: 14px; color: var(--muted); }
@@ -479,16 +592,51 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
    чтобы она не накрывала последний блок и фокус на нём. */
 body.has-sticky { padding-bottom: 84px; }
 
-/* --- 16. Уважение к настройке «меньше движения» --------------------------- */
+/* --- 15a. Появление трёх секций при скролле -------------------------------
+   Класс .ready ставится скриптом после загрузки разметки. Без скриптов
+   ничего не прячется — страница просто показывается целиком. */
+
+.animate .reveal {
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+  transition: opacity 360ms ease, transform 360ms ease;
+}
+.animate .reveal.is-visible { opacity: 1; transform: none; }
+
+/* В репертуаре появляется не вся секция, а три блока подряд,
+   с задержкой в 50 мс между ними. */
+.animate .reveal--stagger { opacity: 1; transform: none; }
+.animate .reveal--stagger .rep {
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+  transition: opacity 340ms ease, transform 340ms ease;
+}
+.animate .reveal--stagger.is-visible .rep { opacity: 1; transform: none; }
+.animate .reveal--stagger.is-visible .rep:nth-child(2) { transition-delay: 50ms; }
+.animate .reveal--stagger.is-visible .rep:nth-child(3) { transition-delay: 100ms; }
+
+/* --- 16. Уважение к настройке «меньше движения» ---------------------------
+   Гасим движение, но оставляем смену состояний у кнопок и полей:
+   без неё интерфейс перестаёт отвечать на действия. */
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .hero__pattern { animation: none; transform: none; }
-  *, *::before, *::after {
-    animation-duration: .001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .001ms !important;
+
+  .string.is-plucked svg { animation: none; }
+  .string svg { transform: scaleY(.04); }
+
+  .animate .reveal,
+  .animate .reveal.is-visible,
+  .animate .reveal--stagger .rep,
+  .animate .reveal--stagger.is-visible .rep {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
+
+  .sample__bar { transition: none; }
+  .video__btn:hover .video__play { transform: none; }
+  .skip-link { transition: none; }
 }
 
 /* --- 17. Планшет ---------------------------------------------------------- */

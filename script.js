@@ -122,6 +122,72 @@
 
   var repList = byId('repertoire-list');
 
+  // Один проигрыватель на весь сайт: пока звучит один сэмпл,
+  // второй запуститься не может.
+  var player = null;
+  var playing = null;
+
+  function stopSample() {
+    if (!playing) return;
+    player.pause();
+    playing.button.setAttribute('aria-pressed', 'false');
+    playing.button.textContent = ui.playSample;
+    playing.bar.style.transform = 'scaleX(0)';
+    playing = null;
+  }
+
+  function startSample(sample) {
+    stopSample();
+
+    if (!player) {
+      player = new Audio();
+      player.preload = 'none';       // ничего не качается, пока не нажали
+      player.addEventListener('timeupdate', function () {
+        if (!playing || !player.duration) return;
+        playing.bar.style.transform = 'scaleX(' + (player.currentTime / player.duration) + ')';
+      });
+      player.addEventListener('ended', stopSample);
+      player.addEventListener('error', stopSample);
+    }
+
+    player.src = sample.src;
+    playing = sample;
+    sample.button.setAttribute('aria-pressed', 'true');
+    sample.button.textContent = ui.stopSample;
+
+    var started = player.play();
+    if (started && started.catch) started.catch(stopSample);
+  }
+
+  function buildSample(item) {
+    var row = el('div', 'sample');
+    var button = el('button', 'sample__btn', ui.playSample);
+    button.type = 'button';
+    row.appendChild(button);
+
+    // Файла ещё нет — кнопка видна, но не работает.
+    if (isUnset(item.sample)) {
+      button.disabled = true;
+      row.appendChild(el('p', 'sample__note', ui.sampleNotSet));
+      return row;
+    }
+
+    var track = el('div', 'sample__track');
+    var bar = el('div', 'sample__bar');
+    track.appendChild(bar);
+    row.appendChild(track);
+
+    var sample = { src: item.sample, button: button, bar: bar };
+    button.setAttribute('aria-pressed', 'false');
+    button.setAttribute('aria-label', ui.playSample + ': ' + item.name);
+    button.addEventListener('click', function () {
+      if (playing === sample) stopSample();
+      else startSample(sample);
+    });
+
+    return row;
+  }
+
   CONTENT.repertoire.items.forEach(function (item) {
     var block = el('article', 'rep');
     block.appendChild(el('h3', 'rep__name', item.name));
@@ -132,6 +198,7 @@
     examples.appendChild(document.createTextNode(item.examples));
     block.appendChild(examples);
 
+    block.appendChild(buildSample(item));
     repList.appendChild(block);
   });
 
@@ -328,24 +395,40 @@
   byId('f-name').placeholder = formText.fields.name.placeholder;
   byId('f-contact').placeholder = formText.fields.contact.placeholder;
 
-  function markInvalid(field, invalid) {
-    field.setAttribute('aria-invalid', invalid ? 'true' : 'false');
-  }
+  // У каждого поля своё сообщение: оно объясняет, чего не хватает,
+  // а не просто красит рамку.
+  var required = [
+    { input: byId('f-name'), message: ui.errors.name },
+    { input: byId('f-date'), message: ui.errors.date },
+    { input: byId('f-contact'), message: ui.errors.contact }
+  ];
+
+  required.forEach(function (field) {
+    field.hint = el('span', 'form__error');
+    field.hint.id = field.input.id + '-error';
+    field.hint.hidden = true;
+    field.input.insertAdjacentElement('afterend', field.hint);
+  });
 
   form.addEventListener('submit', function (event) {
     event.preventDefault();
 
-    // Своя проверка: нужно подсветить поле и увести в него фокус.
-    var required = [byId('f-name'), byId('f-date'), byId('f-contact')];
     var firstBad = null;
     required.forEach(function (field) {
-      var bad = field.value.trim() === '';
-      markInvalid(field, bad);
-      if (bad && !firstBad) firstBad = field;
+      var bad = field.input.value.trim() === '';
+      field.input.setAttribute('aria-invalid', bad ? 'true' : 'false');
+      field.hint.textContent = bad ? field.message : '';
+      field.hint.hidden = !bad;
+      if (bad) {
+        field.input.setAttribute('aria-describedby', field.hint.id);
+        if (!firstBad) firstBad = field.input;
+      } else {
+        field.input.removeAttribute('aria-describedby');
+      }
     });
 
     if (firstBad) {
-      status.textContent = ui.required;
+      status.textContent = '';
       firstBad.focus();
       return;
     }
@@ -408,18 +491,88 @@
   var sticky = byId('sticky');
   var hero = byId('top');
 
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(function (entries) {
-      var heroVisible = entries[0].isIntersecting;
-      sticky.hidden = heroVisible;
-      document.body.classList.toggle('has-sticky', !heroVisible);
-    }, { rootMargin: '-120px 0px 0px 0px' }).observe(hero);
-  } else {
+  function showSticky() {
     sticky.hidden = false;
     document.body.classList.add('has-sticky');
   }
 
-  /* --- 16. Напоминание о незаполненных заглушках -------------------------- */
+  if ('IntersectionObserver' in window) {
+    // Появляется один раз, когда первый экран ушёл вверх,
+    // и больше не мигает при прокрутке туда-обратно.
+    var stickyWatcher = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) return;
+      showSticky();
+      stickyWatcher.disconnect();
+    }, { rootMargin: '-120px 0px 0px 0px' });
+    stickyWatcher.observe(hero);
+  } else {
+    showSticky();
+  }
+
+  /* --- 15a. Тексты на местах, страницу можно показывать -------------------- */
+
+  document.documentElement.classList.add('ready');
+
+  /* --- 16. Движение: струны гуслей и появление трёх секций ----------------
+     Всё стартует после DOMContentLoaded, чтобы не задерживать первую
+     отрисовку страницы. Двигаются только transform и opacity. */
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // Движение включаем отдельным классом: страница к этому моменту
+    // уже видима, и если наблюдатель не заведётся, ничего не пропадёт.
+    document.documentElement.classList.add('animate');
+
+    // Струны: чем ниже, тем сильнее провис — как у настоящих гуслей.
+    var box = byId('strings');
+    var rows = [];
+
+    for (var i = 0; i < 6; i++) {
+      var row = el('div', 'string');
+      // Кривая Безье поднимается на половину пути к опорной точке,
+      // поэтому опору уводим вверх с запасом. Нижние струны ходят сильнее.
+      var lift = 5 - i * 2.4;
+      row.innerHTML = '<svg viewBox="0 0 300 20" preserveAspectRatio="none">' +
+        '<path d="M0 19 Q150 ' + lift + ' 300 19"/></svg>';
+      box.appendChild(row);
+      rows.push(row);
+    }
+
+    function pluck(row) {
+      if (row.classList.contains('is-plucked')) return;
+      row.classList.add('is-plucked');
+      setTimeout(function () { row.classList.remove('is-plucked'); }, 900);
+    }
+
+    // С мышью струна отзывается на проведение курсором.
+    // На телефоне курсора нет: одна волна при загрузке, дальше по касанию.
+    var withCursor = window.matchMedia('(hover: hover) and (min-width: 768px)').matches;
+
+    rows.forEach(function (row, index) {
+      row.addEventListener('pointerdown', function () { pluck(row); });
+      if (withCursor) row.addEventListener('mouseenter', function () { pluck(row); });
+      else setTimeout(function () { pluck(row); }, 500 + index * 70);
+    });
+
+    // Появление секций: только три, каждая срабатывает один раз.
+    var sections = document.querySelectorAll('.reveal');
+
+    if (!('IntersectionObserver' in window)) {
+      sections.forEach(function (node) { node.classList.add('is-visible'); });
+      return;
+    }
+
+    var watcher = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        watcher.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -8% 0px' });
+
+    sections.forEach(function (node) { watcher.observe(node); });
+  });
+
+  /* --- 17. Напоминание о незаполненных заглушках -------------------------- */
 
   // Видно только в консоли браузера (F12). Посетитель этого не увидит.
   (function reportPlaceholders() {
