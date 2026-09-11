@@ -12,7 +12,7 @@
    Без подгонки страница дёргалась бы вниз в момент подмены.
    Коэффициент подобран замером — см. ниже. */
 @font-face {
-  font-family: 'Old Standard fallback';
+  font-family: 'Monomakh fallback';
   src: local('Georgia'), local('Times New Roman'), local('Liberation Serif'), local('Tinos');
   size-adjust: 100%;
   font-display: swap;
@@ -24,7 +24,7 @@
   --ink: #2a1e14;          /* тёмное дерево, цвет резьбы и прожига */
   --paper: #f4e9d5;        /* фон страницы — светлая медовая дека */
   --white: #fdf8ee;        /* плашки и поля, самый светлый тон деки */
-  --accent: #8a5a2b;       /* орех: кнопки, ссылки, акцент */
+  --accent: #a8231f;       /* русский красный с орнаментов: кнопки, ссылки, акцент */
   --accent-soft: #c9a227;  /* латунь струн: линии, узор, струны */
   --muted: #6b5644;        /* второстепенный текст */
 
@@ -32,7 +32,7 @@
   --gap: 20px;
   --radius: 8px;
 
-  --font-display: 'Old Standard TT', 'Old Standard fallback', Georgia, 'Times New Roman', serif;
+  --font-display: 'Monomakh', 'Monomakh fallback', Georgia, 'Times New Roman', serif;
   --font-text: 'Golos Text', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   color-scheme: light;
@@ -74,7 +74,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 
 p { margin: 0 0 1em; }
 
-h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 700; line-height: 1.1; text-wrap: balance; }
+h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 400; line-height: 1.1; text-wrap: balance; }
 
 :target { scroll-margin-top: 84px; }
 
@@ -132,6 +132,19 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 70
   font-weight: 600;
 }
 
+/* --- 4a. Орнаментальная лента ---------------------------------------------
+   Ромбы с отростками — мотив с русской набойки и вышивки. Лента режет
+   страницу на части и объявляет смену раздела. Рисуется одним фоном,
+   никаких картинок грузить не нужно. */
+.band {
+  height: 30px;
+  background-color: var(--accent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='30' viewBox='0 0 60 30'%3E%3Cg fill='none' stroke='%23f4e9d5' stroke-width='1.6'%3E%3Cpath d='M30 4L42 15L30 26L18 15Z'/%3E%3Cpath d='M30 11L34 15L30 19L26 15Z'/%3E%3Cpath d='M0 4L6 15L0 26M60 4L54 15L60 26'/%3E%3Cpath d='M12 15h-6M54 15h-6'/%3E%3Cpath d='M6 8v14M54 8v14'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 60px 30px;
+  background-repeat: repeat-x;
+  background-position: center;
+}
+
 /* --- 5. Кнопки и ссылки --------------------------------------------------- */
 
 .btn {
@@ -153,8 +166,8 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 70
 }
 /* Наведение чуть приподнимает кнопку, нажатие — вжимает,
    как настоящую клавишу. Двигается только transform. */
-.btn:hover { background: #714722; transform: translateY(-2px); }
-.btn:active { background: #5c391a; transform: translateY(0) scale(.97); }
+.btn:hover { background: #8d1c19; transform: translateY(-2px); }
+.btn:active { background: #741612; transform: translateY(0) scale(.97); }
 
 /* На тёмном фоне тёмно-красная кнопка сливается — выворачиваем наизнанку */
 .hero .btn--primary,
@@ -223,8 +236,8 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 70
   align-items: center;
   min-height: 44px;                /* палец должен попадать по ссылке */
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 15px;
+  font-weight: 400;
+  font-size: 17px;
   letter-spacing: -.01em;
   color: var(--paper);
   text-decoration: none;
@@ -373,7 +386,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 70
 
 .hero__title {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 400;
   font-size: clamp(32px, 9vw, 70px);
   line-height: 1.04;
   letter-spacing: -.02em;
@@ -492,8 +505,8 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 70
 .format__name {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 21px;
+  font-weight: 400;
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -518,8 +531,8 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 70
 
 .rep__name {
   font-family: var(--font-display);
-  font-size: 19px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 400;
   margin: 0 0 10px;
   padding-top: 16px;
   border-top: 4px solid var(--accent);
@@ -548,7 +561,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 70
   transition: background-color 170ms ease, color 170ms ease, border-color 170ms ease;
 }
 .sample__btn:hover { background: var(--accent); color: var(--white); }
-.sample__btn:active { background: #5c391a; color: var(--white); border-color: #5c391a; }
+.sample__btn:active { background: #741612; color: var(--white); border-color: #741612; }
 .sample__btn[disabled] {
   border-color: var(--accent-soft);
   color: var(--muted);
@@ -744,7 +757,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 70
   font-size: 15px;
 }
 .footer__inner p { margin: 0 0 6px; }
-.footer__brand { font-family: var(--font-display); font-weight: 600; color: var(--paper); }
+.footer__brand { font-family: var(--font-display); font-weight: 400; color: var(--paper); }
 .footer__copy { font-variant-numeric: tabular-nums; }
 
 /* --- 15. Липкая кнопка связи ---------------------------------------------- */
