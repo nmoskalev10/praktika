@@ -113,7 +113,8 @@
       <p class="section__intro" data-text="formats.intro"></p>
       <!-- tabindex нужен, чтобы ленту можно было листать с клавиатуры -->
       <ul class="formats" id="formats-list" tabindex="0" aria-label="" data-attr-aria-label="ui.formatsLabel"></ul>
-      <p class="formats__hint" data-text="ui.formatsScrollHint"></p>
+      <p class="visually-hidden" data-text="ui.formatsScrollHint"></p>
+      <div class="formats__dots" id="formats-dots"></div>
       <p class="section__note" data-text="formats.note"></p>
     </div>
   </section>
@@ -194,7 +195,9 @@
           </p>
           <p class="form__row">
             <label class="form__label" for="f-contact" data-text="contacts.form.fields.contact.label"></label>
-            <input class="form__input" id="f-contact" name="contact" type="text" autocomplete="tel" inputmode="tel" spellcheck="false" required>
+            <!-- Обычная клавиатура: в это поле пишут и номер, и логин
+                 в Telegram, а цифровая не даёт набрать буквы. -->
+            <input class="form__input" id="f-contact" name="contact" type="text" autocomplete="tel" spellcheck="false" required>
           </p>
           <button class="btn btn--primary form__submit" type="submit" id="form-submit" data-text="contacts.form.submit"></button>
           <p class="form__status" id="form-status" role="status" aria-live="polite"></p>

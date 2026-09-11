@@ -121,6 +121,38 @@
     formatsList.appendChild(li);
   });
 
+  // Точки под лентой форматов. На широких экранах лента превращается
+  // в обычный список, и точки прячет CSS.
+  var dotsBox = byId('formats-dots');
+
+  CONTENT.formats.items.forEach(function (item, index) {
+    var dot = el('button', 'formats__dot');
+    dot.type = 'button';
+    dot.setAttribute('aria-label', item.name);
+    dot.setAttribute('aria-current', index === 0 ? 'true' : 'false');
+    dot.addEventListener('click', function () {
+      formatsList.scrollTo({ left: formatsList.children[index].offsetLeft - formatsList.offsetLeft, behavior: 'smooth' });
+    });
+    dotsBox.appendChild(dot);
+  });
+
+  // Отмечаем точку той карточки, что сейчас перед глазами.
+  // Считаем не на каждый пиксель прокрутки, а раз в кадр.
+  var dotTick = false;
+  formatsList.addEventListener('scroll', function () {
+    if (dotTick) return;
+    dotTick = true;
+    requestAnimationFrame(function () {
+      var card = formatsList.children[0];
+      var step = card.getBoundingClientRect().width + 12;
+      var index = Math.round(formatsList.scrollLeft / step);
+      [].forEach.call(dotsBox.children, function (dot, i) {
+        dot.setAttribute('aria-current', i === index ? 'true' : 'false');
+      });
+      dotTick = false;
+    });
+  });
+
   /* --- 5. Репертуар -------------------------------------------------------- */
 
   var repList = byId('repertoire-list');

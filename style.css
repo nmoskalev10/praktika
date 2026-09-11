@@ -356,10 +356,14 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   /* лента начинается от самого края экрана */
   margin-inline: calc(var(--gap) * -1);
   padding-inline: var(--gap);
+  /* карточка встаёт на тот же отступ и в начале ленты, и после прокрутки */
+  scroll-padding-left: var(--gap);
 }
 
 .format {
-  flex: 0 0 84%;
+  /* Из-за края выглядывает только корешок соседней карточки — рамка
+     и полоска фона, без текста: обрезанные слова читаются как поломка. */
+  flex: 0 0 calc(100% - 10px);
   scroll-snap-align: start;
   padding: 20px;
   border: 1px solid var(--kub-pale);
@@ -367,7 +371,36 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   background: var(--white);
 }
 
-.formats__hint { margin-top: 10px; font-size: 14px; color: var(--muted); }
+/* Точки под лентой: показывают, сколько всего форматов и какой открыт.
+   По ним же можно переключаться нажатием. */
+.formats__dots {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+.formats__dot {
+  /* точка маленькая, но нажимаемая область — полноценные 44 px */
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.formats__dot::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--kub-pale);
+  transition: background-color 170ms ease, transform 170ms ease;
+}
+.formats__dot[aria-current="true"]::before {
+  background: var(--kub);
+  transform: scale(1.35);
+}
 
 .format__head {
   display: flex;
@@ -744,7 +777,7 @@ body.has-sticky { padding-bottom: 84px; }
     background: none;
   }
   .format:last-child { border-bottom: 1px solid var(--kub-pale); }
-  .formats__hint { display: none; }
+  .formats__dots { display: none; }
 
   .format__head { flex-wrap: nowrap; }
   .format__meta { grid-template-columns: repeat(3, 1fr); gap: 6px 24px; }

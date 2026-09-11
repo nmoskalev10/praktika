@@ -342,7 +342,7 @@ const CONTENT = {
           label: 'Что за событие',
           options: ['Свадьба', 'Корпоратив', 'Юбилей', 'Городской праздник', 'Другое']
         },
-        contact: { label: 'Телефон или Telegram для ответа', placeholder: '+7 900 000-00-00…' }
+        contact: { label: 'Телефон или Telegram для ответа', placeholder: '+7 900 000-00-00 или @nickname…' }
       },
       submit: 'Отправить заявку',
       success: 'Заявка ушла. Ответим в течение дня.',
