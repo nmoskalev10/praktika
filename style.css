@@ -299,6 +299,24 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   letter-spacing: -.02em;
   margin-bottom: 20px;
 }
+/* Заголовок выезжает построчно из-под невидимой шторки.
+   Строки размечает скрипт — по тому, где браузер сам перенёс текст.
+   Пока скрипт не отработал, строки видны: если что-то пойдёт не так,
+   заголовок останется на месте, а не пропадёт. */
+.hero__title .line {
+  display: block;
+  overflow: hidden;
+  /* запас под нижние выносы букв, чтобы шторка их не срезала */
+  padding-bottom: .08em;
+  margin-bottom: -.08em;
+}
+.hero__title .line__in { display: block; }
+
+.animate .hero__title .line__in {
+  transition: transform 420ms cubic-bezier(.2, .7, .2, 1);
+}
+.animate .hero__title:not(.is-in) .line__in { transform: translateY(105%); }
+
 .hero__subtitle {
   max-width: 46ch;
   font-size: 17px;
@@ -506,6 +524,19 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 
 /* --- 12. О дуэте ---------------------------------------------------------- */
 
+/* Свет в зале гаснет: к концу страницы фон уходит из светлого в тёмный
+   и без стыка переходит в блок контактов. Это не анимация, а обычный
+   градиент — он ничего не стоит и работает даже при выключенном движении.
+   Нижний отступ нужен, чтобы тёмная часть пришлась на пустое место,
+   а не на текст. */
+#about {
+  padding-bottom: 220px;
+  /* Затемнение отмеряем от низа блока, а не в процентах: так оно всегда
+     приходится на пустой отступ и не ложится на текст и фотографию,
+     какой бы длины ни оказался текст. */
+  background: linear-gradient(to bottom, var(--paper) calc(100% - 220px), var(--ink) 100%);
+}
+
 .about { display: grid; gap: 28px; }
 .about__lead { font-size: 19px; }
 
@@ -548,6 +579,16 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 .form__error { margin: 0; font-size: 14px; color: #ffb4b4; }
 .form__submit { margin-top: 8px; width: 100%; }
 .form__status { margin: 12px 0 0; min-height: 1.6em; font-size: 15px; }
+
+/* Ответ формы появляется с коротким движением — человек смотрит именно
+   сюда, когда нажал кнопку. */
+.animate .form__status.is-answer {
+  animation: answer 320ms cubic-bezier(.2, .7, .2, 1) both;
+}
+@keyframes answer {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
 
 .social { margin-top: 44px; }
 .social__list { display: flex; flex-wrap: wrap; gap: 10px 20px; }
@@ -637,6 +678,10 @@ body.has-sticky { padding-bottom: 84px; }
   .sample__bar { transition: none; }
   .video__btn:hover .video__play { transform: none; }
   .skip-link { transition: none; }
+
+  .animate .hero__title .line__in,
+  .animate .hero__title:not(.is-in) .line__in { transform: none; transition: none; }
+  .animate .form__status.is-answer { animation: none; }
 }
 
 /* --- 17. Планшет ---------------------------------------------------------- */

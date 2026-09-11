@@ -42,6 +42,9 @@
 
   function byId(id) { return document.getElementById(id); }
 
+  // Заполняется, когда струны созданы: форма дёргает их после отправки.
+  var playWave = null;
+
   /* --- 1. Расстановка текстов по разметке --------------------------------- */
 
   document.querySelectorAll('[data-text]').forEach(function (node) {
@@ -410,6 +413,15 @@
     field.input.insertAdjacentElement('afterend', field.hint);
   });
 
+  // Ответ формы показываем с коротким движением, перезапуская его
+  // при каждом новом сообщении.
+  function showAnswer(text) {
+    status.classList.remove('is-answer');
+    void status.offsetWidth;          // сброс, иначе анимация не начнётся заново
+    status.textContent = text;
+    status.classList.add('is-answer');
+  }
+
   form.addEventListener('submit', function (event) {
     event.preventDefault();
 
@@ -434,7 +446,7 @@
     }
 
     if (isUnset(formText.formspreeId)) {
-      status.textContent = formText.notConfigured;
+      showAnswer(formText.notConfigured);
       return;
     }
 
@@ -450,10 +462,11 @@
       .then(function (response) {
         if (!response.ok) throw new Error('formspree');
         form.reset();
-        status.textContent = formText.success;
+        showAnswer(formText.success);
+        if (playWave) playWave();       // струны отзываются на отправленную заявку
       })
       .catch(function () {
-        status.textContent = formText.error;
+        showAnswer(formText.error);
       })
       .then(function () {
         submitButton.disabled = false;
@@ -513,23 +526,55 @@
 
   document.documentElement.classList.add('ready');
 
-  /* --- 16. Движение: струны гуслей и появление трёх секций ----------------
-     Всё стартует после DOMContentLoaded, чтобы не задерживать первую
-     отрисовку страницы. Двигаются только transform и opacity. */
+  /* --- 16. Движение: заголовок, струны, появление секций -------------------
+     Стартует после DOMContentLoaded, чтобы не задерживать первую отрисовку.
+     Двигаются только transform и opacity. */
 
   document.addEventListener('DOMContentLoaded', function () {
-    // Движение включаем отдельным классом: страница к этому моменту
-    // уже видима, и если наблюдатель не заведётся, ничего не пропадёт.
+    // Отдельный класс: страница уже видима, и если что-то здесь упадёт,
+    // контент не пропадёт.
     document.documentElement.classList.add('animate');
 
-    // Струны: чем ниже, тем сильнее провис — как у настоящих гуслей.
+    // Режем заголовок там же, где перенёс браузер: слова на одной
+    // высоте — это одна строка.
+    (function () {
+      var title = document.querySelector('.hero__title');
+      var words = title.textContent.split(' ');
+
+      title.textContent = '';
+      words.forEach(function (word, i) {
+        title.appendChild(el('span', null, word + (i < words.length - 1 ? ' ' : '')));
+      });
+
+      var lines = [], top = null;
+      [].forEach.call(title.children, function (span) {
+        if (span.offsetTop !== top) { lines.push(''); top = span.offsetTop; }
+        lines[lines.length - 1] += span.textContent;
+      });
+
+      title.textContent = '';
+      lines.forEach(function (text, i) {
+        var inner = el('span', 'line__in', text);
+        inner.style.transitionDelay = i * 55 + 'ms';
+        var line = el('span', 'line');
+        line.appendChild(inner);
+        title.appendChild(line);
+      });
+
+      // Через кадр, иначе выезда не будет.
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { title.classList.add('is-in'); });
+      });
+    })();
+
+    // Струны: чем ниже, тем сильнее провис.
     var box = byId('strings');
     var rows = [];
 
     for (var i = 0; i < 6; i++) {
       var row = el('div', 'string');
-      // Кривая Безье поднимается на половину пути к опорной точке,
-      // поэтому опору уводим вверх с запасом. Нижние струны ходят сильнее.
+      // Кривая идёт на половину пути к опорной точке, поэтому опору
+      // уводим выше. Нижние струны ходят сильнее.
       var lift = 5 - i * 2.4;
       row.innerHTML = '<svg viewBox="0 0 300 20" preserveAspectRatio="none">' +
         '<path d="M0 19 Q150 ' + lift + ' 300 19"/></svg>';
@@ -543,8 +588,15 @@
       setTimeout(function () { row.classList.remove('is-plucked'); }, 900);
     }
 
-    // С мышью струна отзывается на проведение курсором.
-    // На телефоне курсора нет: одна волна при загрузке, дальше по касанию.
+    // Волна по струнам — ответ на отправленную заявку.
+    playWave = function () {
+      rows.forEach(function (row, index) {
+        setTimeout(function () { pluck(row); }, index * 80);
+      });
+    };
+
+    // С мышью — отклик на курсор. На телефоне курсора нет:
+    // одна волна при загрузке, дальше по касанию.
     var withCursor = window.matchMedia('(hover: hover) and (min-width: 768px)').matches;
 
     rows.forEach(function (row, index) {
@@ -553,7 +605,7 @@
       else setTimeout(function () { pluck(row); }, 500 + index * 70);
     });
 
-    // Появление секций: только три, каждая срабатывает один раз.
+    // Появление секций: три штуки, каждая один раз.
     var sections = document.querySelectorAll('.reveal');
 
     if (!('IntersectionObserver' in window)) {
