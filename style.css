@@ -61,7 +61,10 @@ body {
   line-height: 1.6;
   overflow-x: hidden;             /* страховка от горизонтального скролла */
   touch-action: manipulation;      /* убирает задержку двойного тапа */
-  -webkit-tap-highlight-color: rgba(31, 46, 110, .15);
+  /* Браузер на телефоне сам рисует серый прямоугольник по касанию —
+     он не знает формы элемента и портит круглые точки и тонкие струны.
+     Выключаем: у каждого элемента ниже есть собственный отклик на нажатие. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 img { max-width: 100%; height: auto; display: block; }
@@ -182,6 +185,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   text-decoration-thickness: 1.5px;
 }
 .link-underline:hover { text-decoration-thickness: 3px; }
+.link-underline:active { opacity: .65; }
 
 /* --- 6. Шапка ------------------------------------------------------------- */
 
@@ -221,6 +225,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   text-decoration: none;
 }
 .nav__list a:hover { color: var(--white); text-decoration: underline; text-underline-offset: 4px; }
+.nav__list a:active { color: var(--white); opacity: .7; }
 
 /* --- 7. Первый экран ------------------------------------------------------ */
 
@@ -401,6 +406,11 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   background: var(--kub);
   transform: scale(1.35);
 }
+/* Отклик на само нажатие: точка на миг становится крупнее и темнее */
+.formats__dot:active::before {
+  background: var(--kub);
+  transform: scale(1.6);
+}
 
 .format__head {
   display: flex;
@@ -525,6 +535,8 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   transition: transform 180ms ease;
 }
 .video__btn:hover .video__play { transform: scale(1.05); }
+.video__btn:active .video__play { transform: scale(.96); }
+.video__btn:active .video__poster { opacity: 1; }
 .video__play svg { width: 22px; height: 22px; margin-left: 3px; }
 
 .video__caption { margin: 8px 0 0; font-size: 14px; color: var(--muted); }
