@@ -8,34 +8,31 @@
 
 /* --- 1. Токены: цвета, шрифты, размеры ----------------------------------- */
 
-/* Подменный шрифт на те доли секунды, пока грузится Unbounded.
-   Unbounded заметно шире системных гротесков, поэтому заголовок на нём
-   занимает на две строки больше. Без подгонки страница дёргалась бы вниз
-   в момент подмены (сдвиг вёрстки 0.88 при допустимых 0.1).
-   Коэффициент 145% подобран так, чтобы заголовок занимал ровно столько же
-   строк, сколько на настоящем шрифте — проверено на 390, 768 и 1280 px. */
+/* Подменный шрифт на те доли секунды, пока грузится заголовочный.
+   Без подгонки страница дёргалась бы вниз в момент подмены.
+   Коэффициент подобран замером — см. ниже. */
 @font-face {
-  font-family: 'Unbounded fallback';
-  src: local('Arial'), local('Liberation Sans'), local('Helvetica'), local('Roboto');
-  size-adjust: 145%;
+  font-family: 'Old Standard fallback';
+  src: local('Georgia'), local('Times New Roman'), local('Liberation Serif'), local('Tinos');
+  size-adjust: 100%;
   font-display: swap;
 }
 
 :root {
-  /* Палитра «ель и киноварь»: светлое дерево деки и красная охра,
-     которой расписывали старые инструменты. */
-  --ink: #191512;          /* тёплый почти-чёрный, цвет морёного торца */
-  --paper: #f2efe9;        /* фон страницы, светлая ель */
-  --white: #fbfaf7;        /* плашки и поля — тёплый белый, не ледяной */
-  --accent: #a93b2c;       /* киноварь: кнопки, ссылки, акцент */
-  --accent-soft: #e2cdc4;  /* разбавленная киноварь: линии, струны, паттерн */
-  --muted: #6b5f57;        /* второстепенный текст */
+  /* Палитра снята с самих гуслей: медовая дека из клёна, тёмная резьба
+     по краю, латунные струны. */
+  --ink: #2a1e14;          /* тёмное дерево, цвет резьбы и прожига */
+  --paper: #f4e9d5;        /* фон страницы — светлая медовая дека */
+  --white: #fdf8ee;        /* плашки и поля, самый светлый тон деки */
+  --accent: #8a5a2b;       /* орех: кнопки, ссылки, акцент */
+  --accent-soft: #c9a227;  /* латунь струн: линии, узор, струны */
+  --muted: #6b5644;        /* второстепенный текст */
 
   --wrap: 1120px;
   --gap: 20px;
   --radius: 8px;
 
-  --font-display: 'Unbounded', 'Unbounded fallback', 'Trebuchet MS', system-ui, sans-serif;
+  --font-display: 'Old Standard TT', 'Old Standard fallback', Georgia, 'Times New Roman', serif;
   --font-text: 'Golos Text', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   color-scheme: light;
@@ -77,7 +74,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 
 p { margin: 0 0 1em; }
 
-h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 600; line-height: 1.1; text-wrap: balance; }
+h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 700; line-height: 1.1; text-wrap: balance; }
 
 :target { scroll-margin-top: 84px; }
 
@@ -152,11 +149,12 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color 160ms ease, color 160ms ease;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
 }
-.btn:hover { background: #8f3024; }
-/* Нажатие видно и на телефоне, где наведения не существует */
-.btn:active { background: #74251b; }
+/* Наведение чуть приподнимает кнопку, нажатие — вжимает,
+   как настоящую клавишу. Двигается только transform. */
+.btn:hover { background: #714722; transform: translateY(-2px); }
+.btn:active { background: #5c391a; transform: translateY(0) scale(.97); }
 
 /* На тёмном фоне тёмно-красная кнопка сливается — выворачиваем наизнанку */
 .hero .btn--primary,
@@ -176,24 +174,40 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 .btn--outline:hover { background: rgba(255, 255, 255, .1); }
 .btn--outline:active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-soft); }
 
+/* Подчёркивание не мигает, а выезжает сбоку: полоска растягивается
+   от левого края через transform, поэтому вёрстка не пересчитывается. */
 .link-underline {
+  position: relative;
   display: inline-flex;
   align-items: center;
   min-height: 44px;
   color: inherit;
   font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  text-decoration-thickness: 1.5px;
+  text-decoration: none;
 }
-.link-underline:hover { text-decoration-thickness: 3px; }
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 10px;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(1);
+  transform-origin: left center;
+  transition: transform 220ms cubic-bezier(.2, .7, .2, 1);
+}
+.link-underline:hover::after { animation: underline-sweep 380ms cubic-bezier(.2, .7, .2, 1); }
 .link-underline:active { opacity: .65; }
+
+@keyframes underline-sweep {
+  0%   { transform: scaleX(0); transform-origin: left center; }
+  100% { transform: scaleX(1); transform-origin: left center; }
+}
 
 /* --- 6. Шапка ------------------------------------------------------------- */
 
 .header {
   position: sticky; top: 0; z-index: 40;
-  background: rgba(25, 21, 18, .96);
+  background: rgba(42, 30, 20, .96);
   color: var(--paper);
 }
 .header__inner {
@@ -209,7 +223,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   align-items: center;
   min-height: 44px;                /* палец должен попадать по ссылке */
   font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 700;
   font-size: 15px;
   letter-spacing: -.01em;
   color: var(--paper);
@@ -240,13 +254,14 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   padding-inline: var(--gap);
 }
 
-/* Набивной узор — статичный фон первого экрана. */
+/* Восьмиконечная розетка — та, что прожигают на деке гуслей.
+   Статичный фон первого экрана, цвет латуни при низкой яркости. */
 .hero__pattern {
   position: absolute;
   inset: 0;
-  opacity: .1;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M36 9c6 8 6 13 0 21-6-8-6-13 0-21z'/%3E%3Cpath d='M36 63c6-8 6-13 0-21-6 8-6 13 0 21z'/%3E%3Cpath d='M9 36c8 6 13 6 21 0-8-6-13-6-21 0z'/%3E%3Cpath d='M63 36c-8 6-13 6-21 0 8-6 13-6 21 0z'/%3E%3Ccircle cx='36' cy='36' r='3.5'/%3E%3Cpath d='M0 0l5 5-5 5-5-5z'/%3E%3Cpath d='M72 0l5 5-5 5-5-5z'/%3E%3Cpath d='M0 72l5 5-5 5-5-5z'/%3E%3Cpath d='M72 72l5 5-5 5-5-5z'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 72px 72px;
+  opacity: .09;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23c9a227' stroke-width='1.3'%3E%3Cpath d='M48 28L51.1 40.6L62.1 33.9L55.4 44.9L68 48L55.4 51.1L62.1 62.1L51.1 55.4L48 68L44.9 55.4L33.9 62.1L40.6 51.1L28 48L40.6 44.9L33.9 33.9L44.9 40.6Z'/%3E%3Ccircle cx='48' cy='48' r='5'/%3E%3Cpath d='M48 2l5 5-5 5-5-5z'/%3E%3Cpath d='M0 48l5 5-5 5-5-5z'/%3E%3Cpath d='M96 48l5 5-5 5-5-5z'/%3E%3Cpath d='M48 94l5 5-5 5-5-5z'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 96px 96px;
 }
 
 /* --- 7a. Струны гуслей — главный приём -----------------------------------
@@ -260,21 +275,21 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
    На широком экране встают рядом — так читается, что это дуэт. */
 .duet {
   display: grid;
-  gap: 22px;
-  margin-top: 32px;
-  max-width: 460px;
+  gap: 14px;
+  margin-top: 26px;
+  max-width: 430px;
 }
 
 .strings {
   /* Место под шесть струн занято заранее: скрипт добавляет их после
      загрузки, и без этой высоты страница дёрнулась бы вниз. */
-  min-height: 144px;
+  min-height: 120px;
 }
 
 .string {
   display: flex;
   align-items: flex-end;
-  height: 24px;                    /* зона попадания курсора и пальца */
+  height: 20px;                    /* зона попадания курсора и пальца */
   cursor: pointer;
 }
 .string svg {
@@ -282,30 +297,34 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   height: 20px;
   display: block;
   overflow: visible;
-  /* Почти ноль, но не ноль: при scaleY(0) матрица вырождается
-     и браузер перестаёт рисовать элемент целиком. */
-  transform: scaleY(.04);
+  /* В покое масштаб единичный: струна нарисована почти прямой и потому
+     выглядит чистой яркой линией. Сплющенная дуга размазывалась
+     сглаживанием и темнела втрое — выглядела грязным штрихом. */
+  transform: scaleY(1);
   transform-origin: bottom center;
 }
 .string path {
   fill: none;
-  stroke: var(--accent-soft);
-  stroke-width: 1.4;
+  /* Светлая латунь: тёмный акцент на тёмном дереве не читался вовсе */
+  stroke: #e6d3a0;
+  stroke-width: 2;
   vector-effect: non-scaling-stroke;
-  opacity: .85;
-  transition: opacity 170ms ease;
+  opacity: .95;
+  transition: opacity 170ms ease, stroke 170ms ease;
 }
-.string:hover path { opacity: 1; }
+.string:hover path { opacity: 1; stroke: var(--white); }
 
 .string.is-plucked svg { animation: pluck 880ms cubic-bezier(.3, .55, .35, 1) both; }
 
+/* Щипок растягивает еле заметный прогиб в настоящую волну и гасит её.
+   --amp своя у каждой струны: нижние ходят сильнее. */
 @keyframes pluck {
-  0%   { transform: scaleY(1); }
-  20%  { transform: scaleY(-.58); }
-  42%  { transform: scaleY(.32); }
-  62%  { transform: scaleY(-.17); }
-  80%  { transform: scaleY(.07); }
-  100% { transform: scaleY(.04); }
+  0%   { transform: scaleY(var(--amp)); }
+  20%  { transform: scaleY(calc(var(--amp) * -.58)); }
+  42%  { transform: scaleY(calc(var(--amp) * .32)); }
+  62%  { transform: scaleY(calc(var(--amp) * -.17)); }
+  80%  { transform: scaleY(calc(var(--amp) * .07)); }
+  100% { transform: scaleY(1); }
 }
 
 /* --- 7b. Кнопки баяна ----------------------------------------------------
@@ -315,7 +334,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 
 .keys {
   display: grid;
-  gap: 6px;
+  gap: 5px;
   align-content: center;
 }
 
@@ -326,13 +345,15 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 }
 
 .keys__btn {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   padding: 0;
-  /* светлый контур читается на тёмном фоне лучше, чем серая заливка */
-  border: 1.5px solid rgba(226, 205, 196, .62);
+  /* Кнопки баяна — перламутровые: светлые и плотные. Полупрозрачные
+     кружки на тёмном фоне читались как брак печати, а не как инструмент. */
+  border: 1.5px solid rgba(42, 30, 20, .55);
   border-radius: 50%;
-  background: rgba(242, 239, 233, .08);
+  background: var(--paper);
+  box-shadow: inset 0 -2px 0 rgba(42, 30, 20, .18);
   cursor: pointer;
   transition: background-color 160ms ease, transform 160ms ease, border-color 160ms ease;
 }
@@ -352,8 +373,8 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 
 .hero__title {
   font-family: var(--font-display);
-  font-weight: 800;
-  font-size: clamp(30px, 8.5vw, 66px);
+  font-weight: 700;
+  font-size: clamp(32px, 9vw, 70px);
   line-height: 1.04;
   letter-spacing: -.02em;
   margin-bottom: 20px;
@@ -527,7 +548,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   transition: background-color 170ms ease, color 170ms ease, border-color 170ms ease;
 }
 .sample__btn:hover { background: var(--accent); color: var(--white); }
-.sample__btn:active { background: #74251b; color: var(--white); border-color: #74251b; }
+.sample__btn:active { background: #5c391a; color: var(--white); border-color: #5c391a; }
 .sample__btn[disabled] {
   border-color: var(--accent-soft);
   color: var(--muted);
@@ -785,7 +806,7 @@ body.has-sticky { padding-bottom: 84px; }
   html { scroll-behavior: auto; }
 
   .string.is-plucked svg { animation: none; }
-  .string svg { transform: scaleY(.04); }
+  .string svg { transform: scaleY(1); }
 
   .animate .reveal,
   .animate .reveal.is-visible,
@@ -797,6 +818,8 @@ body.has-sticky { padding-bottom: 84px; }
   }
 
   .sample__bar { transition: none; }
+  .btn:hover, .btn:active { transform: none; }
+  .link-underline:hover::after { animation: none; }
   .video__btn:hover .video__play { transform: none; }
   .skip-link { transition: none; }
 
@@ -862,7 +885,7 @@ body.has-sticky { padding-bottom: 84px; }
 
   /* Места хватает — инструменты встают рядом */
   .duet { grid-template-columns: 1fr auto; gap: 32px; align-items: center; margin-top: 28px; }
-  .strings { min-height: 124px; }
+  .strings { min-height: 120px; }
   .hero__figure { margin: 0; }
   .hero__photo { aspect-ratio: 3 / 4; }
 

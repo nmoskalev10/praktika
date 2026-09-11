@@ -564,11 +564,11 @@
     var box = byId('strings');
     for (var i = 0; i < 6; i++) {
       var row = el('div', 'string');
-      // Кривая идёт на половину пути к опорной точке, поэтому опору
-      // уводим выше. Нижние струны ходят сильнее.
-      var lift = 5 - i * 2.4;
+      // Прогиб почти нулевой — в покое это ровная линия. Размах щипка
+      // задаёт --amp: у нижних струн он больше.
+      row.style.setProperty('--amp', 14 + i * 4);
       row.innerHTML = '<svg viewBox="0 0 300 20" preserveAspectRatio="none">' +
-        '<path d="M0 19 Q150 ' + lift + ' 300 19"/></svg>';
+        '<path d="M0 19 Q150 18.4 300 19"/></svg>';
       box.appendChild(row);
       stringRows.push(row);
     }
@@ -576,11 +576,11 @@
 
   (function buildKeys() {
     var box = byId('keys');
-    // Пять рядов по восемь кнопок. Каждый ряд сдвинут вправо —
-    // из-за этого ряды у баяна и читаются наискось.
-    for (var r = 0; r < 5; r++) {
+    // Три ряда по восемь кнопок — столько несёт основная клавиатура баяна.
+    // Каждый ряд сдвинут вправо, из-за этого ряды читаются наискось.
+    for (var r = 0; r < 3; r++) {
       var row = el('div', 'keys__row');
-      row.style.marginLeft = r * 10 + 'px';
+      row.style.marginLeft = r * 11 + 'px';
       for (var k = 0; k < 8; k++) {
         var key = el('button', 'keys__btn');
         key.type = 'button';
