@@ -47,6 +47,8 @@ const CONTENT = {
     videoNotSet: 'Видео пока не добавлено',
     audioNotSet: 'Плейлист пока не подключён. Как это сделать — в README.md, раздел 5.',
     photosScrollHint: 'Листайте вбок, чтобы посмотреть все фотографии',
+    formatsScrollHint: 'Листайте вбок, чтобы посмотреть все форматы',
+    formatsLabel: 'Форматы выступлений, листается вбок',
     stickyLabel: 'Быстрая связь',
     contactsNotSet: 'Контакты пока не вписаны. Добавьте их в content.js, раздел 8.',
     durationLabel: 'Длительность',

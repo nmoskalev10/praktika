@@ -150,13 +150,16 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   transition: background-color 160ms ease, color 160ms ease;
 }
 .btn:hover { background: #172354; }
-.btn:active { background: #121c44; }
+/* Нажатие видно и на телефоне, где наведения не существует */
+.btn:active { background: #0f1838; }
 
 /* На тёмном фоне синяя кнопка сливается — выворачиваем наизнанку */
 .hero .btn--primary,
 .section--ink .btn--primary { background: var(--paper); color: var(--ink); }
 .hero .btn--primary:hover,
 .section--ink .btn--primary:hover { background: var(--white); }
+.hero .btn--primary:active,
+.section--ink .btn--primary:active { background: var(--kub-pale); color: var(--kub); }
 
 .btn--compact { min-height: 44px; padding: 10px 18px; font-size: 15px; }
 
@@ -166,6 +169,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   color: var(--paper);
 }
 .btn--outline:hover { background: rgba(255, 255, 255, .1); }
+.btn--outline:active { background: var(--kub-pale); color: var(--kub); border-color: var(--kub-pale); }
 
 .link-underline {
   display: inline-flex;
@@ -337,13 +341,33 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 
 /* --- 8. Форматы ----------------------------------------------------------- */
 
-.formats { margin-top: 28px; }
+/* На телефоне форматы — лента, которую листают вбок: шесть пунктов
+   подряд вниз читать утомительно. Соседняя карточка нарочно выглядывает
+   из-за края, чтобы было видно, что список продолжается.
+   С планшета и шире возвращается обычный список. */
+.formats {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  padding-bottom: 10px;
+  /* лента начинается от самого края экрана */
+  margin-inline: calc(var(--gap) * -1);
+  padding-inline: var(--gap);
+}
 
 .format {
-  padding-block: 22px;
-  border-top: 1px solid var(--kub-pale);
+  flex: 0 0 84%;
+  scroll-snap-align: start;
+  padding: 20px;
+  border: 1px solid var(--kub-pale);
+  border-radius: var(--radius);
+  background: var(--white);
 }
-.format:last-child { border-bottom: 1px solid var(--kub-pale); }
+
+.formats__hint { margin-top: 10px; font-size: 14px; color: var(--muted); }
 
 .format__head {
   display: flex;
@@ -410,6 +434,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   transition: background-color 170ms ease, color 170ms ease, border-color 170ms ease;
 }
 .sample__btn:hover { background: var(--kub); color: var(--white); }
+.sample__btn:active { background: #0f1838; color: var(--white); border-color: #0f1838; }
 .sample__btn[disabled] {
   border-color: var(--kub-pale);
   color: var(--muted);
@@ -627,6 +652,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   border: 1.5px solid var(--kub-pale);
 }
 .sticky .btn--icon:hover { background: var(--kub-pale); }
+.sticky .btn--icon:active { background: var(--kub); color: var(--white); border-color: var(--kub); }
 .sticky .btn--icon svg { width: 22px; height: 22px; }
 
 /* Пока панель видна, добавляем воздух внизу страницы,
@@ -701,6 +727,24 @@ body.has-sticky { padding-bottom: 84px; }
   .reviews { grid-template-columns: repeat(3, 1fr); }
   .contacts__buttons { grid-template-columns: repeat(2, 1fr); }
   .contacts__buttons .btn { width: auto; }
+
+  /* Места хватает — лента снова становится списком */
+  .formats {
+    display: block;
+    overflow: visible;
+    margin-inline: 0;
+    padding-inline: 0;
+    padding-bottom: 0;
+  }
+  .format {
+    padding: 22px 0;
+    border: 0;
+    border-top: 1px solid var(--kub-pale);
+    border-radius: 0;
+    background: none;
+  }
+  .format:last-child { border-bottom: 1px solid var(--kub-pale); }
+  .formats__hint { display: none; }
 
   .format__head { flex-wrap: nowrap; }
   .format__meta { grid-template-columns: repeat(3, 1fr); gap: 6px 24px; }
