@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#101318">
+<meta name="theme-color" content="#191512">
 
 <!-- ===========================================================================
      ТЕГИ ДЛЯ ПОИСКОВИКОВ И МЕССЕНДЖЕРОВ.
@@ -96,9 +96,14 @@
           <a class="btn btn--primary" href="#contacts" data-text="cta"></a>
           <a class="link-underline hero__video-link" href="#media" data-text="hero.secondaryLink"></a>
         </div>
-        <!-- Струны гуслей. В покое каждая дуга сплющена в прямую линию;
-             при щипке распрямляется и затухает. Только transform: scaleY. -->
-        <div class="strings" id="strings" aria-hidden="true"></div>
+        <!-- Два инструмента дуэта. Слева струны гуслей: в покое дуга
+             сплющена в прямую линию, при щипке распрямляется и затухает.
+             Справа правая клавиатура баяна — круглые кнопки косыми рядами,
+             они утапливаются при нажатии. Всё на transform. -->
+        <div class="duet" aria-hidden="true">
+          <div class="strings" id="strings"></div>
+          <div class="keys" id="keys"></div>
+        </div>
       </div>
       <figure class="hero__figure">
         <img class="hero__photo" id="hero-photo" alt="" decoding="async" fetchpriority="high">

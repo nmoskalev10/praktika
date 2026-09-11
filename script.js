@@ -554,7 +554,44 @@
     showSticky();
   }
 
-  /* --- 15a. Тексты на местах, страницу можно показывать -------------------- */
+  /* --- 15a. Инструменты дуэта на первом экране -----------------------------
+     Струны гуслей и кнопки баяна. Разметку строим сразу, а отклик
+     навешиваем ниже, вместе с остальным движением. */
+
+  var stringRows = [];
+
+  (function buildStrings() {
+    var box = byId('strings');
+    for (var i = 0; i < 6; i++) {
+      var row = el('div', 'string');
+      // Кривая идёт на половину пути к опорной точке, поэтому опору
+      // уводим выше. Нижние струны ходят сильнее.
+      var lift = 5 - i * 2.4;
+      row.innerHTML = '<svg viewBox="0 0 300 20" preserveAspectRatio="none">' +
+        '<path d="M0 19 Q150 ' + lift + ' 300 19"/></svg>';
+      box.appendChild(row);
+      stringRows.push(row);
+    }
+  })();
+
+  (function buildKeys() {
+    var box = byId('keys');
+    // Пять рядов по восемь кнопок. Каждый ряд сдвинут вправо —
+    // из-за этого ряды у баяна и читаются наискось.
+    for (var r = 0; r < 5; r++) {
+      var row = el('div', 'keys__row');
+      row.style.marginLeft = r * 10 + 'px';
+      for (var k = 0; k < 8; k++) {
+        var key = el('button', 'keys__btn');
+        key.type = 'button';
+        key.tabIndex = -1;          // украшение: клавиатурой по нему не ходят
+        row.appendChild(key);
+      }
+      box.appendChild(row);
+    }
+  })();
+
+  /* --- 15b. Тексты на местах, страницу можно показывать -------------------- */
 
   document.documentElement.classList.add('ready');
 
@@ -599,20 +636,7 @@
       });
     })();
 
-    // Струны: чем ниже, тем сильнее провис.
-    var box = byId('strings');
-    var rows = [];
-
-    for (var i = 0; i < 6; i++) {
-      var row = el('div', 'string');
-      // Кривая идёт на половину пути к опорной точке, поэтому опору
-      // уводим выше. Нижние струны ходят сильнее.
-      var lift = 5 - i * 2.4;
-      row.innerHTML = '<svg viewBox="0 0 300 20" preserveAspectRatio="none">' +
-        '<path d="M0 19 Q150 ' + lift + ' 300 19"/></svg>';
-      box.appendChild(row);
-      rows.push(row);
-    }
+    var rows = stringRows;
 
     function pluck(row) {
       if (row.classList.contains('is-plucked')) return;
@@ -620,10 +644,17 @@
       setTimeout(function () { row.classList.remove('is-plucked'); }, 900);
     }
 
-    // Волна по струнам — ответ на отправленную заявку.
+    // Ответ на отправленную заявку: волна по струнам, следом пробег
+    // по кнопкам — отзываются оба инструмента.
     playWave = function () {
       rows.forEach(function (row, index) {
         setTimeout(function () { pluck(row); }, index * 80);
+      });
+      [].forEach.call(document.querySelectorAll('.keys__btn'), function (key, index) {
+        setTimeout(function () {
+          key.classList.add('is-pressed');
+          setTimeout(function () { key.classList.remove('is-pressed'); }, 150);
+        }, 200 + index * 22);
       });
     };
 

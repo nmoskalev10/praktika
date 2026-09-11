@@ -22,12 +22,14 @@
 }
 
 :root {
-  --ink: #101318;        /* текст и тёмные экраны */
-  --paper: #f2f4f7;      /* фон страницы */
-  --white: #ffffff;      /* плашки, поля формы */
-  --kub: #1f2e6e;        /* кубовая синь: кнопки, ссылки, акцент */
-  --kub-pale: #c7d0e8;   /* линии, паттерн */
-  --muted: #5a6270;      /* второстепенный текст */
+  /* Палитра «ель и киноварь»: светлое дерево деки и красная охра,
+     которой расписывали старые инструменты. */
+  --ink: #191512;          /* тёплый почти-чёрный, цвет морёного торца */
+  --paper: #f2efe9;        /* фон страницы, светлая ель */
+  --white: #fbfaf7;        /* плашки и поля — тёплый белый, не ледяной */
+  --accent: #a93b2c;       /* киноварь: кнопки, ссылки, акцент */
+  --accent-soft: #e2cdc4;  /* разбавленная киноварь: линии, струны, паттерн */
+  --muted: #6b5f57;        /* второстепенный текст */
 
   --wrap: 1120px;
   --gap: 20px;
@@ -83,11 +85,11 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 
 /* Видимый фокус на всём, что можно нажать с клавиатуры */
 :focus-visible {
-  outline: 3px solid var(--kub);
+  outline: 3px solid var(--accent);
   outline-offset: 2px;
   border-radius: 3px;
 }
-/* На тёмных экранах синяя обводка не видна — делаем светлую */
+/* На тёмных экранах красная обводка не видна — делаем светлую */
 .hero :focus-visible,
 .section--ink :focus-visible,
 .footer :focus-visible { outline-color: var(--white); }
@@ -101,7 +103,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 .skip-link {
   position: absolute; left: 8px; top: -60px; z-index: 100;
   padding: 12px 16px; border-radius: var(--radius);
-  background: var(--white); color: var(--kub);
+  background: var(--white); color: var(--accent);
   font-weight: 600; text-decoration: none;
   transition: top 150ms ease;
 }
@@ -122,9 +124,9 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 
 .section__title { font-size: clamp(26px, 7vw, 40px); }
 .section__intro { max-width: 62ch; color: var(--muted); }
-.section--ink .section__intro { color: var(--kub-pale); }
+.section--ink .section__intro { color: var(--accent-soft); }
 .section__note { margin-top: 24px; font-size: 14px; color: var(--muted); }
-.section--ink .section__note { color: var(--kub-pale); }
+.section--ink .section__note { color: var(--accent-soft); }
 
 .subtitle {
   margin-top: 40px;
@@ -143,7 +145,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   padding: 14px 26px;
   border: 0;
   border-radius: var(--radius);
-  background: var(--kub);
+  background: var(--accent);
   color: var(--white);
   font-family: var(--font-text);
   font-size: 17px;
@@ -152,27 +154,27 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   cursor: pointer;
   transition: background-color 160ms ease, color 160ms ease;
 }
-.btn:hover { background: #172354; }
+.btn:hover { background: #8f3024; }
 /* Нажатие видно и на телефоне, где наведения не существует */
-.btn:active { background: #0f1838; }
+.btn:active { background: #74251b; }
 
-/* На тёмном фоне синяя кнопка сливается — выворачиваем наизнанку */
+/* На тёмном фоне тёмно-красная кнопка сливается — выворачиваем наизнанку */
 .hero .btn--primary,
 .section--ink .btn--primary { background: var(--paper); color: var(--ink); }
 .hero .btn--primary:hover,
 .section--ink .btn--primary:hover { background: var(--white); }
 .hero .btn--primary:active,
-.section--ink .btn--primary:active { background: var(--kub-pale); color: var(--kub); }
+.section--ink .btn--primary:active { background: var(--accent-soft); color: var(--accent); }
 
 .btn--compact { min-height: 44px; padding: 10px 18px; font-size: 15px; }
 
 .btn--outline {
   background: transparent;
-  border: 1.5px solid var(--kub-pale);
+  border: 1.5px solid var(--accent-soft);
   color: var(--paper);
 }
 .btn--outline:hover { background: rgba(255, 255, 255, .1); }
-.btn--outline:active { background: var(--kub-pale); color: var(--kub); border-color: var(--kub-pale); }
+.btn--outline:active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-soft); }
 
 .link-underline {
   display: inline-flex;
@@ -191,7 +193,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 
 .header {
   position: sticky; top: 0; z-index: 40;
-  background: rgba(16, 19, 24, .96);
+  background: rgba(25, 21, 18, .96);
   color: var(--paper);
 }
 .header__inner {
@@ -220,7 +222,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  color: var(--kub-pale);
+  color: var(--accent-soft);
   font-size: 15px;
   text-decoration: none;
 }
@@ -238,7 +240,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   padding-inline: var(--gap);
 }
 
-/* Паттерн кубовой набойки — статичный фон первого экрана. */
+/* Набивной узор — статичный фон первого экрана. */
 .hero__pattern {
   position: absolute;
   inset: 0;
@@ -253,9 +255,17 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
    колебания. Двигается только transform, вёрстка не пересчитывается.
    Толщина линии не тянется за масштабом благодаря non-scaling-stroke. */
 
-.strings {
+/* Панель двух инструментов. На телефоне половины идут друг под другом:
+   если поделить 360 px пополам, струны превращаются в обрубки.
+   На широком экране встают рядом — так читается, что это дуэт. */
+.duet {
+  display: grid;
+  gap: 22px;
   margin-top: 32px;
-  max-width: 420px;
+  max-width: 460px;
+}
+
+.strings {
   /* Место под шесть струн занято заранее: скрипт добавляет их после
      загрузки, и без этой высоты страница дёрнулась бы вниз. */
   min-height: 144px;
@@ -279,10 +289,10 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 }
 .string path {
   fill: none;
-  stroke: var(--kub-pale);
+  stroke: var(--accent-soft);
   stroke-width: 1.4;
   vector-effect: non-scaling-stroke;
-  opacity: .72;
+  opacity: .85;
   transition: opacity 170ms ease;
 }
 .string:hover path { opacity: 1; }
@@ -296,6 +306,46 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   62%  { transform: scaleY(-.17); }
   80%  { transform: scaleY(.07); }
   100% { transform: scaleY(.04); }
+}
+
+/* --- 7b. Кнопки баяна ----------------------------------------------------
+   У баяна на правой стороне не клавиши, а круглые кнопки: пять рядов,
+   каждый следующий сдвинут — поэтому ряды читаются по диагонали.
+   Кнопка отзывается иначе, чем струна: не колеблется, а утапливается. */
+
+.keys {
+  display: grid;
+  gap: 6px;
+  align-content: center;
+}
+
+.keys__row {
+  display: flex;
+  gap: 6px;
+  /* сдвиг ряда задаёт скрипт — из-за него ряды идут наискось */
+}
+
+.keys__btn {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  /* светлый контур читается на тёмном фоне лучше, чем серая заливка */
+  border: 1.5px solid rgba(226, 205, 196, .62);
+  border-radius: 50%;
+  background: rgba(242, 239, 233, .08);
+  cursor: pointer;
+  transition: background-color 160ms ease, transform 160ms ease, border-color 160ms ease;
+}
+.keys__btn:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+}
+/* Нажатая кнопка уходит вглубь корпуса */
+.keys__btn:active,
+.keys__btn.is-pressed {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(.78);
 }
 
 .hero__inner { position: relative; max-width: var(--wrap); margin: 0 auto; }
@@ -329,7 +379,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 .hero__subtitle {
   max-width: 46ch;
   font-size: 17px;
-  color: var(--kub-pale);
+  color: var(--accent-soft);
   margin-bottom: 28px;
 }
 .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 22px; }
@@ -371,7 +421,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   flex: 0 0 calc(100% - 10px);
   scroll-snap-align: start;
   padding: 20px;
-  border: 1px solid var(--kub-pale);
+  border: 1px solid var(--accent-soft);
   border-radius: var(--radius);
   background: var(--white);
 }
@@ -399,16 +449,16 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--kub-pale);
+  background: var(--accent-soft);
   transition: background-color 170ms ease, transform 170ms ease;
 }
 .formats__dot[aria-current="true"]::before {
-  background: var(--kub);
+  background: var(--accent);
   transform: scale(1.35);
 }
 /* Отклик на само нажатие: точка на миг становится крупнее и темнее */
 .formats__dot:active::before {
-  background: var(--kub);
+  background: var(--accent);
   transform: scale(1.6);
 }
 
@@ -428,7 +478,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 }
 .format__price {
   font-weight: 600;
-  color: var(--kub);
+  color: var(--accent);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -451,7 +501,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   font-weight: 600;
   margin: 0 0 10px;
   padding-top: 16px;
-  border-top: 4px solid var(--kub);
+  border-top: 4px solid var(--accent);
   display: inline-block;
 }
 .rep__text { margin-bottom: 10px; }
@@ -466,37 +516,37 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   flex: 0 0 auto;
   min-height: 44px;
   padding: 10px 20px;
-  border: 1.5px solid var(--kub);
+  border: 1.5px solid var(--accent);
   border-radius: 999px;
   background: transparent;
-  color: var(--kub);
+  color: var(--accent);
   font-family: var(--font-text);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 170ms ease, color 170ms ease, border-color 170ms ease;
 }
-.sample__btn:hover { background: var(--kub); color: var(--white); }
-.sample__btn:active { background: #0f1838; color: var(--white); border-color: #0f1838; }
+.sample__btn:hover { background: var(--accent); color: var(--white); }
+.sample__btn:active { background: #74251b; color: var(--white); border-color: #74251b; }
 .sample__btn[disabled] {
-  border-color: var(--kub-pale);
+  border-color: var(--accent-soft);
   color: var(--muted);
   cursor: default;
 }
 .sample__btn[disabled]:hover { background: transparent; color: var(--muted); }
-.sample__btn[aria-pressed="true"] { background: var(--kub); color: var(--white); }
+.sample__btn[aria-pressed="true"] { background: var(--accent); color: var(--white); }
 
 .sample__track {
   flex: 1 1 auto;
   min-width: 0;
   height: 3px;
   border-radius: 2px;
-  background: var(--kub-pale);
+  background: var(--accent-soft);
   overflow: hidden;
 }
 .sample__bar {
   height: 100%;
-  background: var(--kub);
+  background: var(--accent);
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform 260ms linear;
@@ -531,7 +581,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   display: grid; place-items: center;
   border-radius: 50%;
   background: var(--white);
-  color: var(--kub);
+  color: var(--accent);
   transition: transform 180ms ease;
 }
 .video__btn:hover .video__play { transform: scale(1.05); }
@@ -552,14 +602,14 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 .audio { margin-top: 12px; }
 .audio__note, .media__empty {
   padding: 16px;
-  border: 1.5px dashed var(--kub-pale);
+  border: 1.5px dashed var(--accent-soft);
   border-radius: var(--radius);
   color: var(--muted);
   font-size: 15px;
   margin: 0;
 }
 /* На тёмном фоне серый текст не читается */
-.section--ink .media__empty { color: var(--kub-pale); }
+.section--ink .media__empty { color: var(--accent-soft); }
 
 /* Лента фотографий: на телефоне листается вбок */
 .photos {
@@ -585,7 +635,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 
 .review {
   margin: 0;                       /* у blockquote есть свой отступ, он тут лишний */
-  border-left: 3px solid var(--kub);
+  border-left: 3px solid var(--accent);
   padding-left: 18px;
 }
 .review__text { margin-bottom: 10px; }
@@ -630,7 +680,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 .form { display: grid; gap: 4px; max-width: 520px; }
 .form__row { display: grid; gap: 6px; margin: 0 0 16px; }
 .form__label { font-size: 15px; font-weight: 600; }
-.form__hint { font-size: 13px; color: var(--kub-pale); }
+.form__hint { font-size: 13px; color: var(--accent-soft); }
 
 .form__input {
   min-height: 52px;
@@ -643,7 +693,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   font-size: 16px;                 /* меньше 16px — iOS зумит страницу */
   width: 100%;
 }
-.form__input:hover { border-color: var(--kub-pale); }
+.form__input:hover { border-color: var(--accent-soft); }
 .form__input[aria-invalid="true"] { border-color: #b03030; }
 
 .form__error { margin: 0; font-size: 14px; color: #ffb4b4; }
@@ -662,13 +712,13 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
 
 .social { margin-top: 44px; }
 .social__list { display: flex; flex-wrap: wrap; gap: 10px 20px; }
-.social__list a { color: var(--kub-pale); }
+.social__list a { color: var(--accent-soft); }
 
 /* --- 14. Подвал ----------------------------------------------------------- */
 
 .footer {
   background: var(--ink);
-  color: var(--kub-pale);
+  color: var(--accent-soft);
   padding-block: 32px;
   font-size: 15px;
 }
@@ -683,7 +733,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   left: 0; right: 0; bottom: 0;
   z-index: 50;
   background: var(--white);
-  border-top: 1px solid var(--kub-pale);
+  border-top: 1px solid var(--accent-soft);
   padding: 10px var(--gap) calc(10px + env(safe-area-inset-bottom));
 }
 .sticky__inner { display: flex; gap: 10px; max-width: var(--wrap); margin: 0 auto; }
@@ -693,11 +743,11 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 60
   width: 52px;
   padding: 0;
   background: var(--paper);
-  color: var(--kub);
-  border: 1.5px solid var(--kub-pale);
+  color: var(--accent);
+  border: 1.5px solid var(--accent-soft);
 }
-.sticky .btn--icon:hover { background: var(--kub-pale); }
-.sticky .btn--icon:active { background: var(--kub); color: var(--white); border-color: var(--kub); }
+.sticky .btn--icon:hover { background: var(--accent-soft); }
+.sticky .btn--icon:active { background: var(--accent); color: var(--white); border-color: var(--accent); }
 .sticky .btn--icon svg { width: 22px; height: 22px; }
 
 /* Пока панель видна, добавляем воздух внизу страницы,
@@ -784,11 +834,11 @@ body.has-sticky { padding-bottom: 84px; }
   .format {
     padding: 22px 0;
     border: 0;
-    border-top: 1px solid var(--kub-pale);
+    border-top: 1px solid var(--accent-soft);
     border-radius: 0;
     background: none;
   }
-  .format:last-child { border-bottom: 1px solid var(--kub-pale); }
+  .format:last-child { border-bottom: 1px solid var(--accent-soft); }
   .formats__dots { display: none; }
 
   .format__head { flex-wrap: nowrap; }
@@ -807,8 +857,12 @@ body.has-sticky { padding-bottom: 84px; }
   .header__inner { padding-block: 14px; }
   .brand { font-size: 17px; }
 
-  .hero { padding-block: 80px 96px; }
+  .hero { padding-block: 56px 72px; }
   .hero__inner { display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; align-items: center; }
+
+  /* Места хватает — инструменты встают рядом */
+  .duet { grid-template-columns: 1fr auto; gap: 32px; align-items: center; margin-top: 28px; }
+  .strings { min-height: 124px; }
   .hero__figure { margin: 0; }
   .hero__photo { aspect-ratio: 3 / 4; }
 
