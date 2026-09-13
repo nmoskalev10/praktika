@@ -596,6 +596,254 @@
       });
   });
 
+  /* --- 13а. Опросник -------------------------------------------------------
+     Собирает выступление из ответов, считает вилку и складывает готовый
+     текст заявки. Ничего никуда не отправляет: человек забирает текст
+     кнопкой и шлёт сам — поэтому опроснику не нужен сервер.
+     Вопросы, ответы и цены целиком лежат в content.js, раздел 7а.
+     ---------------------------------------------------------------------- */
+
+  function buildBrief() {
+    var brief = CONTENT.brief;
+    var box = byId('brief-groups');
+    if (!brief || !box) return;
+
+    // Что выбрано: для одиночных вопросов строка, для множественных массив.
+    var выбор = {};
+
+    var dateField = byId('brief-date');
+    var sumNode = byId('brief-sum');
+    var textNode = byId('brief-text');
+    var statusNode = byId('brief-status');
+
+    /* --- цена ------------------------------------------------------------
+       Сначала складываем все прибавки, потом умножаем на все множители.
+       Разделяем их, потому что «плюс 15% за выходной» должен ложиться
+       на всю сумму, а не на один ответ. */
+
+    function собранное() {
+      var список = [];
+      brief.groups.forEach(function (group) {
+        var v = выбор[group.id];
+        var ids = group.type === 'many' ? (v || []) : (v ? [v] : []);
+        var ответы = [];
+        ids.forEach(function (id) {
+          group.options.forEach(function (option) {
+            if (option.id === id) ответы.push(option);
+          });
+        });
+        if (ответы.length) список.push({ group: group, options: ответы });
+      });
+      return список;
+    }
+
+    function вилка(список) {
+      var база = 0, допы = 0, множитель = 1;
+
+      список.forEach(function (пара) {
+        пара.options.forEach(function (option) {
+          if (option.koef) множитель *= option.koef;
+          if (!option.plus) return;
+          // Стоимость самого события растёт от длительности и дня недели.
+          // Аппаратура, бензин и дополнения — нет: их складываем отдельно
+          // и прибавляем уже после умножения.
+          if (пара.group.base) база += option.plus; else допы += option.plus;
+        });
+      });
+
+      // Без выбранного формата считать нечего: набор допов
+      // сам по себе не бюджет вечера.
+      if (!база) return null;
+
+      var середина = база * множитель + допы;
+      var шаг = brief.spread || 0.15;
+      // Округляем до тысячи: вилка и так приблизительная, точность
+      // до рубля создавала бы ложное впечатление сметы.
+      var округлить = function (n) { return Math.round(n / 1000) * 1000; };
+      return [округлить(середина * (1 - шаг)), округлить(середина * (1 + шаг))];
+    }
+
+    // Неразрывные пробелы: «45 000 ₽» не должно разрываться переносом.
+    function число(n) {
+      return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+
+    // Рубль ставим один раз на всю вилку: «94 000 – 127 000 ₽»
+    function деньги(цена) {
+      return число(цена[0]) + ' – ' + число(цена[1]) + ' ₽';
+    }
+
+    function датаСловами() {
+      if (!dateField || !dateField.value) return null;
+      var d = new Date(dateField.value + 'T12:00:00');
+      if (isNaN(d)) return null;
+      var день = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+      var неделя = d.toLocaleDateString('ru-RU', { weekday: 'long' });
+      return день + ' ' + d.getFullYear() + ', ' + неделя;
+    }
+
+    /* --- текст заявки ---------------------------------------------------- */
+
+    function собратьТекст(список, цена) {
+      var строки = [brief.greeting, ''];
+      строки.push(brief.dateLine + ': ' + (датаСловами() || brief.dateUnknown));
+      список.forEach(function (пара) {
+        var названия = пара.options.map(function (o) { return o.label; });
+        строки.push(пара.group.label + ': ' + названия.join(', '));
+      });
+      if (цена) {
+        строки.push('');
+        строки.push(brief.budgetLine + ': ' + деньги(цена));
+      }
+      строки.push('');
+      строки.push(brief.signOff);
+      return строки.join('\n');
+    }
+
+    function пересчитать() {
+      var список = собранное();
+      var цена = вилка(список);
+      sumNode.textContent = цена ? деньги(цена) : brief.resultEmpty;
+      textNode.value = собратьТекст(список, цена);
+      statusNode.textContent = '';
+    }
+
+    /* --- вопросы --------------------------------------------------------- */
+
+    brief.groups.forEach(function (group, gi) {
+      выбор[group.id] = group.type === 'many' ? [] : null;
+
+      var wrap = el('div', 'brief__group');
+      var label = el('span', 'brief__label', group.label);
+      label.id = 'brief-g' + gi;
+
+      var chips = el('div', 'chips');
+      // Для одиночного вопроса это переключатель, для множественного —
+      // просто группа кнопок. Скринридер читает их по-разному.
+      chips.setAttribute('role', group.type === 'one' ? 'radiogroup' : 'group');
+      chips.setAttribute('aria-labelledby', label.id);
+
+      group.options.forEach(function (option) {
+        var chip = el('button', 'chip', option.label);
+        chip.type = 'button';
+        if (group.type === 'one') {
+          chip.setAttribute('role', 'radio');
+          chip.setAttribute('aria-checked', 'false');
+        } else {
+          chip.setAttribute('aria-pressed', 'false');
+        }
+
+        chip.addEventListener('click', function () {
+          if (group.type === 'one') {
+            // Повторное нажатие снимает выбор: человек мог ткнуть случайно
+            var былВыбран = выбор[group.id] === option.id;
+            выбор[group.id] = былВыбран ? null : option.id;
+            [].forEach.call(chips.children, function (other) {
+              other.setAttribute('aria-checked', other === chip && !былВыбран ? 'true' : 'false');
+            });
+          } else {
+            var список = выбор[group.id];
+            var i = список.indexOf(option.id);
+            if (i === -1) список.push(option.id); else список.splice(i, 1);
+            chip.setAttribute('aria-pressed', i === -1 ? 'true' : 'false');
+          }
+          пересчитать();
+        });
+
+        chips.appendChild(chip);
+      });
+
+      wrap.appendChild(label);
+      wrap.appendChild(chips);
+      box.appendChild(wrap);
+    });
+
+    if (dateField) dateField.addEventListener('change', пересчитать);
+
+    /* --- кнопки ---------------------------------------------------------- */
+
+    var actions = byId('brief-actions');
+
+    function скопировать() {
+      // Современный способ работает не везде: в старых браузерах его нет,
+      // а внутри рамки предпросмотра он бывает запрещён. Поэтому запасной
+      // путь через выделение, а если и он не сработал — честно говорим,
+      // что текст надо выделить руками.
+      var текст = textNode.value;
+      var готово = function () { statusNode.textContent = brief.copied; };
+      var провал = function () { statusNode.textContent = brief.copyFailed; };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(текст).then(готово, старыйСпособ);
+      } else {
+        старыйСпособ();
+      }
+
+      function старыйСпособ() {
+        try {
+          textNode.removeAttribute('readonly');
+          textNode.select();
+          textNode.setSelectionRange(0, текст.length);
+          var ок = document.execCommand('copy');
+          textNode.setAttribute('readonly', '');
+          if (ок) готово(); else провал();
+        } catch (e) {
+          провал();
+        }
+      }
+    }
+
+    var copyBtn = el('button', 'btn btn--primary', brief.copy);
+    copyBtn.type = 'button';
+    copyBtn.addEventListener('click', скопировать);
+    actions.appendChild(copyBtn);
+
+    // Telegram не умеет подставлять текст в переписку по ссылке, поэтому
+    // сначала кладём текст в буфер, потом открываем чат — остаётся вставить.
+    var tg = CONTENT.contacts.telegram;
+    if (!isUnset(tg)) {
+      var tgBtn = el('button', 'btn btn--outline', brief.toTelegram);
+      tgBtn.type = 'button';
+      tgBtn.addEventListener('click', function () {
+        скопировать();
+        window.open('https://t.me/' + tg, '_blank', 'noopener');
+      });
+      actions.appendChild(tgBtn);
+    }
+
+    // WhatsApp текст в ссылке принимает, вставлять ничего не нужно.
+    var wa = CONTENT.contacts.whatsapp;
+    if (!isUnset(wa)) {
+      var waBtn = el('a', 'btn btn--outline', brief.toWhatsapp);
+      waBtn.target = '_blank';
+      waBtn.rel = 'noopener';
+      waBtn.addEventListener('click', function () {
+        this.href = 'https://wa.me/' + wa + '?text=' + encodeURIComponent(textNode.value);
+      });
+      waBtn.href = 'https://wa.me/' + wa;
+      actions.appendChild(waBtn);
+    }
+
+    пересчитать();
+  }
+
+  // Опросник — это 72 кнопки, и строить их до первой отрисовки незачем:
+  // он лежит внизу страницы. Собираем, когда до него остаётся экран
+  // прокрутки — к моменту, когда человек долистает, всё уже готово.
+  // Без IntersectionObserver собираем сразу: лучше медленнее, чем никак.
+  (function ленивыйОпросник() {
+    var section = byId('brief');
+    if (!section) return;
+    if (!('IntersectionObserver' in window)) { buildBrief(); return; }
+
+    var watcher = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      watcher.disconnect();
+      buildBrief();
+    }, { rootMargin: '800px 0px' });
+    watcher.observe(section);
+  })();
+
   /* --- 14. Год в подвале --------------------------------------------------- */
 
   byId('footer-copy').textContent =

@@ -876,6 +876,93 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 .social__list { display: flex; flex-wrap: wrap; gap: 10px 20px; }
 .social__list a { color: var(--accent-soft); }
 
+/* --- 13а. Опросник --------------------------------------------------------
+   Все ответы — таблетки, как переключатель в форме: по ним удобно
+   попадать пальцем и сразу видно, что выбрано. Вопросов много,
+   поэтому между группами воздуха больше, чем внутри группы. */
+
+.brief { display: grid; gap: 26px; margin-top: 30px; }
+
+.brief__label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.chip {
+  min-height: 44px;                /* палец попадает без промаха */
+  padding: 9px 16px;
+  border: 1.5px solid var(--accent-soft);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--paper);
+  font-family: var(--font-text);
+  font-size: 15px;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, transform 130ms ease;
+}
+.chip:hover { background: rgba(253, 248, 238, .12); }
+.chip:active { transform: scale(.94); }
+/* Выбранное горит латунью — тем же цветом, что струны и узор */
+.chip[aria-checked="true"],
+.chip[aria-pressed="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.brief__date { margin-top: 30px; max-width: 520px; }
+
+.brief__result {
+  margin: 30px 0 40px;
+  padding: 20px;
+  border: 1.5px solid var(--accent-soft);
+  border-radius: var(--radius);
+}
+.brief__resultTitle {
+  margin: 0 0 6px;
+  font-family: var(--font-text);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--accent-soft);
+}
+.brief__sum {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+  font-size: clamp(24px, 7vw, 34px);
+  line-height: 1.15;
+  color: var(--white);
+  font-variant-numeric: tabular-nums;
+}
+.brief__fine { margin: 0 0 14px; font-size: 14px; color: var(--accent-soft); }
+
+.brief__text {
+  width: 100%;
+  padding: 14px;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: 16px;                 /* меньше 16px — iOS зумит страницу */
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.brief__actions { display: grid; gap: 10px; margin-top: 12px; }
+.brief__actions .btn { width: 100%; }
+
+@media (min-width: 700px) {
+  .brief__actions { grid-template-columns: repeat(3, 1fr); }
+  .brief__actions .btn { width: auto; }
+}
+
 /* --- 14. Подвал ----------------------------------------------------------- */
 
 .footer {
