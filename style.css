@@ -393,12 +393,12 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 .string {
   display: flex;
   align-items: flex-end;
-  height: 9px;                     /* струны лежат плотно, как на инструменте */
+  height: 10px;                    /* струны лежат плотно, как на инструменте */
   cursor: pointer;
 }
 .string svg {
   width: 100%;
-  height: 9px;
+  height: 10px;
   display: block;
   overflow: visible;
 }
@@ -427,8 +427,8 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 /* Струны стали лежать плотнее, поэтому и размах меньше: прежние 5 px
    при шаге 9 px наезжали бы на соседнюю струну. */
 @keyframes pluck {
-  0%   { transform: translateY(-2.6px); }
-  18%  { transform: translateY(2.1px); }
+  0%   { transform: translateY(-2.9px); }
+  18%  { transform: translateY(2.3px); }
   36%  { transform: translateY(-1.4px); }
   54%  { transform: translateY(.85px); }
   72%  { transform: translateY(-.5px); }
@@ -450,10 +450,10 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   gap: 4px;
   align-content: center;
   width: 100%;                    /* клавиатура занимает свою половину целиком */
-  min-height: 90px;
-  /* Крайние ряды сдвинуты в стороны на 8 px — ровно столько отступа
-     им и нужно, иначе крайние кнопки срезает краем половины. */
-  padding-inline: 8px;
+  min-height: 80px;
+  /* Крайние ряды сдвинуты в стороны на 6 px; берём 7 — на пиксель
+     больше, чтобы обводка крайней кнопки не цеплялась за край. */
+  padding-inline: 7px;
 }
 
 /* Ряд — сетка из равных колонок, поэтому кнопки растягиваются
@@ -482,9 +482,9 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   cursor: pointer;
   transition: background-color 160ms ease, transform 160ms ease, border-color 160ms ease;
 }
-/* На баяне ряды идут через один: перламутровый и чёрный.
-   Так их и различают на ощупь, не глядя на клавиатуру. */
-.keys__row--dark .keys__btn {
+/* На баяне светлые и тёмные кнопки идут столбцами вдоль грифа —
+   по этим полосам и находят нужный ряд, не глядя на клавиатуру. */
+.keys__btn--dark {
   background: #1e1a16;
   border-color: rgba(244, 233, 213, .35);
   box-shadow: inset 0 -1px 0 rgba(244, 233, 213, .12);
