@@ -543,6 +543,11 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   /* Карточка встаёт по центру экрана, а не прижимается к левому краю:
      иначе слева выступ 0, а справа 18 px — и лента выглядит съехавшей. */
   scroll-snap-align: center;
+  /* Останавливаемся на каждой карточке. По умолчанию быстрый смах
+     пролетает точки остановки насквозь и лента улетает сразу до конца:
+     замерено — один резкий смах уносил на пять карточек. С always
+     браузер обязан затормозить на ближайшей. */
+  scroll-snap-stop: always;
   padding: 20px;
   border: 1px solid var(--accent-soft);
   border-radius: var(--radius);
@@ -744,7 +749,9 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   overscroll-behavior-x: contain;
   padding-bottom: 8px;
 }
-.photos li { flex: 0 0 76%; scroll-snap-align: start; }
+/* Ленте фотографий нужна та же остановка: без неё смах пролистывает
+   половину галереи разом. */
+.photos li { flex: 0 0 76%; scroll-snap-align: start; scroll-snap-stop: always; }
 .photos img {
   width: 100%;
   aspect-ratio: 3 / 4;
