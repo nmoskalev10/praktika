@@ -722,7 +722,7 @@
       // В покое струна почти прямая. Нижние струны гудят дольше.
       row.style.setProperty('--ring', (760 + i * 110) + 'ms');
       row.innerHTML = '<svg viewBox="0 0 300 20" preserveAspectRatio="none">' +
-        '<path d="M0 19 Q150 18.4 300 19"/></svg>';
+        '<path d="M0 10 Q150 9.4 300 10"/></svg>';
       box.appendChild(row);
       stringRows.push(row);
     }

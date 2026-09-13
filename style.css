@@ -48,6 +48,10 @@
 
   --wrap: 1120px;
   --gap: 20px;
+  /* Шаг панели инструментов: одна струна слева и один ряд кнопок справа
+     занимают ровно столько. Отсюда струны и ряды идут на одной высоте. */
+  --panel-step: 20px;
+  --panel-gap: 4px;
   --radius: 8px;
 
   /* Три заголовочных шрифта, у каждого своя работа.
@@ -392,13 +396,15 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 
 .string {
   display: flex;
-  align-items: flex-end;
-  height: 20px;                    /* зона попадания курсора и пальца */
+  /* По центру, а не по низу: струна должна идти ровно посередине своей
+     полосы — тогда она совпадает с серединой ряда кнопок напротив. */
+  align-items: center;
+  height: var(--panel-step);       /* зона попадания курсора и пальца */
   cursor: pointer;
 }
 .string svg {
   width: 100%;
-  height: 20px;
+  height: var(--panel-step);
   display: block;
   overflow: visible;
 }
@@ -447,7 +453,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 
 .keys {
   display: grid;
-  gap: 4px;
+  gap: var(--panel-gap);
   align-content: center;
   width: 100%;                    /* клавиатура занимает свою половину целиком */
   min-height: 80px;
@@ -461,10 +467,15 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
    Сдвиг ряда задаёт скрипт через transform: средний ряд стоит на месте,
    верхний и нижний уходят в разные стороны на одинаковую величину.
    Так остаётся и косина настоящей клавиатуры, и симметрия блока. */
+/* Высота ряда задана явно, а не выведена из размера кнопки: кнопка
+   тянется по ширине колонки и на узком экране выходит чуть меньше.
+   Без этого шаг рядов уплывал и переставал совпадать со струнами. */
 .keys__row {
   display: grid;
   grid-template-columns: repeat(var(--per, 8), 1fr);
-  gap: 4px;
+  align-items: center;
+  gap: var(--panel-gap);
+  height: calc(var(--panel-step) - var(--panel-gap));
 }
 
 .keys__btn {
@@ -1275,9 +1286,10 @@ body.has-sticky { padding-bottom: 84px; }
   .hero { padding-block: 56px 72px; }
   .hero__inner { display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; align-items: center; }
 
-  /* Места хватает — инструменты встают рядом */
-  .duet { grid-template-columns: 1fr auto; gap: 32px; align-items: center; margin-top: 28px; }
-  .strings { min-height: 120px; }
+  /* Места хватает — половины шире, но по-прежнему равные.
+     Высоту струнам здесь не задаём: она должна остаться той же,
+     что у клавиатуры, иначе половины разъедутся по вертикали. */
+  .duet { grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; margin-top: 28px; }
   .hero__figure { margin: 0; }
   .hero__photo { aspect-ratio: 3 / 4; }
 
