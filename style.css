@@ -393,12 +393,12 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 .string {
   display: flex;
   align-items: flex-end;
-  height: 10px;                    /* струны лежат плотно, как на инструменте */
+  height: 20px;                    /* зона попадания курсора и пальца */
   cursor: pointer;
 }
 .string svg {
   width: 100%;
-  height: 10px;
+  height: 20px;
   display: block;
   overflow: visible;
 }
@@ -411,7 +411,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   fill: none;
   /* Светлая латунь: тёмный акцент на тёмном дереве не читался вовсе */
   stroke: #e6d3a0;
-  stroke-width: 1.3;
+  stroke-width: 2;
   vector-effect: non-scaling-stroke;
   opacity: .95;
   transition: opacity 170ms ease, stroke 170ms ease;
@@ -424,15 +424,15 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 }
 .string.is-plucked path { animation: pluck-glow var(--ring, 900ms) ease-out both; }
 
-/* Струны стали лежать плотнее, поэтому и размах меньше: прежние 5 px
-   при шаге 9 px наезжали бы на соседнюю струну. */
+/* Размах щипка укладывается в шаг между струнами — 20 px,
+   поэтому соседнюю он не задевает. */
 @keyframes pluck {
-  0%   { transform: translateY(-2.9px); }
-  18%  { transform: translateY(2.3px); }
-  36%  { transform: translateY(-1.4px); }
-  54%  { transform: translateY(.85px); }
-  72%  { transform: translateY(-.5px); }
-  86%  { transform: translateY(.2px); }
+  0%   { transform: translateY(-5px); }
+  18%  { transform: translateY(4px); }
+  36%  { transform: translateY(-2.6px); }
+  54%  { transform: translateY(1.6px); }
+  72%  { transform: translateY(-.9px); }
+  86%  { transform: translateY(.4px); }
   100% { transform: translateY(0); }
 }
 @keyframes pluck-glow {

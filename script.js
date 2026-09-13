@@ -714,16 +714,15 @@
 
   (function buildStrings() {
     var box = byId('strings');
-    // Столько струн, чтобы блок совпал по высоте с четырьмя рядами
-    // кнопок справа: 8 струн по 10 px — это ровно 80 px,
-    // и 4 ряда по 17 px с промежутками по 4 px — тоже 80 px.
-    var count = narrowPanel ? 8 : 12;
+    // Четыре струны, шаг 20 px. Вместе это 80 px — ровно столько же,
+    // сколько занимают четыре ряда кнопок справа.
+    var count = 4;
     for (var i = 0; i < count; i++) {
       var row = el('div', 'string');
       // В покое струна почти прямая. Нижние струны гудят дольше.
-      row.style.setProperty('--ring', (700 + i * 70) + 'ms');
-      row.innerHTML = '<svg viewBox="0 0 300 10" preserveAspectRatio="none">' +
-        '<path d="M0 9 Q150 8.6 300 9"/></svg>';
+      row.style.setProperty('--ring', (760 + i * 110) + 'ms');
+      row.innerHTML = '<svg viewBox="0 0 300 20" preserveAspectRatio="none">' +
+        '<path d="M0 19 Q150 18.4 300 19"/></svg>';
       box.appendChild(row);
       stringRows.push(row);
     }
