@@ -131,7 +131,10 @@
     dot.setAttribute('aria-label', item.name);
     dot.setAttribute('aria-current', index === 0 ? 'true' : 'false');
     dot.addEventListener('click', function () {
-      formatsList.scrollTo({ left: formatsList.children[index].offsetLeft - formatsList.offsetLeft, behavior: 'smooth' });
+      // inline: 'center' повторяет то, как карточка встаёт при
+      // обычном пролистывании; block: 'nearest' не даёт странице
+      // прыгнуть по вертикали.
+      formatsList.children[index].scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
     });
     dotsBox.appendChild(dot);
   });
