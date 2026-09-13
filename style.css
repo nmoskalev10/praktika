@@ -963,6 +963,97 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   .brief__actions .btn { width: auto; }
 }
 
+/* --- 13б. Врезка опросника на главной ------------------------------------- */
+
+.teaser { max-width: 46ch; }
+.teaser__text { color: var(--accent-soft); margin-bottom: 10px; }
+.teaser__note { font-size: 14px; color: var(--muted); margin-bottom: 22px; }
+/* На тёмном фоне обычный приглушённый цвет не читается */
+.section--ink .teaser__note { color: #9b8a72; }
+.teaser__btn { width: 100%; }
+
+@media (min-width: 700px) {
+  .teaser__btn { width: auto; }
+}
+
+/* --- 13в. Страница опросника ---------------------------------------------
+   Отдельная страница, поэтому у неё свой фон и свой низ: кнопки шага
+   всегда под рукой, а не в конце длинного списка. */
+
+.page--brief { background: var(--ink); color: var(--paper); }
+.page--brief .header { position: static; }
+.header__back { color: var(--accent-soft); font-size: 15px; }
+
+.briefPage { padding-block: 24px 140px; }   /* снизу место под панель шага */
+
+.progress { margin-bottom: 26px; }
+.progress__count {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--accent-soft);
+  font-variant-numeric: tabular-nums;
+}
+.progress__track {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(201, 162, 39, .28);
+  overflow: hidden;
+}
+/* Тянем через scaleX, а не ширину: ширина заставила бы браузер
+   пересчитывать вёрстку на каждом шаге. */
+.progress__bar {
+  height: 100%;
+  background: var(--accent-soft);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 320ms cubic-bezier(.2, .7, .2, 1);
+}
+
+.step:focus { outline: none; }        /* фокус ставим программно, рамка не нужна */
+.step__question {
+  font-size: clamp(24px, 6.5vw, 34px);
+  margin-bottom: 6px;
+}
+.step__hint { font-size: 14px; color: var(--accent-soft); margin-bottom: 16px; }
+.step__date { margin-top: 28px; max-width: 520px; }
+
+/* Нижняя панель: слева бегущая вилка, справа шаги */
+.stepbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 50;
+  background: var(--white);
+  border-top: 1px solid var(--accent-soft);
+  padding: 10px var(--gap) calc(10px + env(safe-area-inset-bottom));
+}
+.stepbar__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  max-width: var(--wrap);
+  margin: 0 auto;
+}
+.stepbar__sum {
+  flex: 1 1 100%;
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 20px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.stepbar__buttons { display: flex; gap: 10px; flex: 1 1 100%; }
+.stepbar__buttons .btn { flex: 1 1 auto; }
+.stepbar .btn--outline { color: var(--accent); border-color: var(--accent); }
+.stepbar .btn--outline:hover { background: rgba(168, 35, 31, .1); }
+.stepbar .btn--outline:active { background: var(--accent); color: var(--white); }
+
+@media (min-width: 700px) {
+  .stepbar__sum { flex: 1 1 auto; font-size: 22px; }
+  .stepbar__buttons { flex: 0 0 auto; }
+  .stepbar__buttons .btn { flex: 0 0 auto; }
+}
+
 /* --- 14. Подвал ----------------------------------------------------------- */
 
 .footer {

@@ -181,36 +181,18 @@
 
   <div class="band band--left" aria-hidden="true"></div>
 
-  <!-- ОПРОСНИК: собирает выступление и считает вилку.
-       Вопросы, ответы и цены лежат в content.js, раздел 7а.
-       Здесь только пустые места — их заполняет скрипт. -->
+  <!-- ВРЕЗКА ОПРОСНИКА.
+       Сам опросник живёт на отдельной странице brief.html: семьдесят
+       с лишним кнопок на главной превращались в стену, которую надо
+       пролистывать до контактов. Здесь только приглашение. -->
   <section class="section section--ink" id="brief">
     <div class="wrap">
-      <h2 class="section__title" data-text="brief.title"></h2>
-      <p class="section__intro" data-text="brief.intro"></p>
-
-      <div class="brief" id="brief-groups"></div>
-
-      <p class="form__row brief__date">
-        <label class="form__label" for="brief-date" data-text="brief.dateLabel"></label>
-        <input class="form__input" id="brief-date" name="brief_date" type="date">
-        <span class="form__hint" data-text="brief.dateHint"></span>
-      </p>
-
-      <div class="brief__result">
-        <h3 class="brief__resultTitle" data-text="brief.resultTitle"></h3>
-        <p class="brief__sum" id="brief-sum"></p>
-        <p class="brief__fine" data-text="brief.resultHint"></p>
+      <div class="teaser">
+        <h2 class="section__title" data-text="brief.teaser.title"></h2>
+        <p class="teaser__text" data-text="brief.teaser.text"></p>
+        <p class="teaser__note" id="teaser-note"></p>
+        <a class="btn btn--primary teaser__btn" href="brief.html" data-text="brief.teaser.button"></a>
       </div>
-
-      <h3 class="subtitle" data-text="brief.messageTitle"></h3>
-      <p class="brief__fine" data-text="brief.messageHint"></p>
-      <!-- readonly, а не disabled: текст можно выделить и скопировать
-           руками, если кнопка копирования почему-то не сработает -->
-      <textarea class="brief__text" id="brief-text" rows="9" readonly
-                aria-label="" data-attr-aria-label="brief.messageTitle"></textarea>
-      <div class="brief__actions" id="brief-actions"></div>
-      <p class="form__status" id="brief-status" role="status" aria-live="polite"></p>
     </div>
   </section>
 
