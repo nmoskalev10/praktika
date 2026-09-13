@@ -45,12 +45,14 @@
   var КЛЮЧ = 'instilerusso-brief';
   var выбор = {};
   var дата = '';
+  var уточнения = {};   // тексты из полей «Другое» и подобных, ключ — id ответа
 
   try {
     var сохранённое = JSON.parse(localStorage.getItem(КЛЮЧ) || '{}');
     if (сохранённое && typeof сохранённое === 'object') {
       выбор = сохранённое.выбор || {};
       дата = сохранённое.дата || '';
+      уточнения = сохранённое.уточнения || {};
     }
   } catch (e) { /* памяти нет — не беда */ }
 
@@ -62,7 +64,8 @@
 
   function запомнить() {
     try {
-      localStorage.setItem(КЛЮЧ, JSON.stringify({ выбор: выбор, дата: дата }));
+      localStorage.setItem(КЛЮЧ,
+        JSON.stringify({ выбор: выбор, дата: дата, уточнения: уточнения }));
     } catch (e) { /* переполнено или запрещено — не мешаем работе */ }
   }
 
@@ -116,8 +119,11 @@
     var строки = [brief.greeting, ''];
     строки.push(brief.dateLine + ': ' + (датаСловами() || brief.dateUnknown));
     список.forEach(function (пара) {
-      строки.push(пара.group.label + ': ' +
-        пара.options.map(function (o) { return o.label; }).join(', '));
+      строки.push(пара.group.label + ': ' + пара.options.map(function (o) {
+        // У ответов вроде «Другое» рядом пишем, что именно человек имел в виду
+        var свой = (уточнения[o.id] || '').trim();
+        return свой ? o.label + ' — ' + свой : o.label;
+      }).join(', '));
     });
     if (цена) {
       строки.push('');
@@ -162,6 +168,8 @@
       сцена.appendChild(el('p', 'step__hint', brief.manyHint));
     }
 
+    var поля = [];            // поля ввода у ответов с пометкой ask
+
     var chips = el('div', 'chips');
     chips.setAttribute('role', group.type === 'one' ? 'radiogroup' : 'group');
     chips.setAttribute('aria-label', group.label);
@@ -194,13 +202,48 @@
           if (i === -1) список.push(option.id); else список.splice(i, 1);
           chip.setAttribute('aria-pressed', i === -1 ? 'true' : 'false');
         }
+        // Поле нужного ответа показываем, чужие прячем
+        поля.forEach(function (п) {
+          var выбрано = group.type === 'many'
+            ? выбор[group.id].indexOf(п.option.id) !== -1
+            : выбор[group.id] === п.option.id;
+          п.узел.hidden = !выбрано;
+          if (выбрано && п.option === option) п.ввод.focus();
+        });
+
+        byId('brief-status-line').textContent = '';
         запомнить();
         обновитьПодвал();
       });
 
       chips.appendChild(chip);
+
+      // У ответа с пометкой ask под таблетками открывается поле:
+      // «Другое» без пояснения — бесполезный ответ.
+      if (option.ask) {
+        var поле = el('p', 'ask');
+        поле.hidden = !выбрано;
+
+        var подпись = el('label', 'ask__label', option.ask);
+        подпись.htmlFor = 'ask-' + option.id;
+
+        var ввод = el('input', 'form__input');
+        ввод.type = 'text';
+        ввод.id = 'ask-' + option.id;
+        ввод.placeholder = brief.askPlaceholder;
+        ввод.value = уточнения[option.id] || '';
+        ввод.addEventListener('input', function () {
+          уточнения[option.id] = this.value;
+          запомнить();
+        });
+
+        поле.appendChild(подпись);
+        поле.appendChild(ввод);
+        поля.push({ option: option, узел: поле, ввод: ввод, chip: chip });
+      }
     });
     сцена.appendChild(chips);
+    поля.forEach(function (п) { сцена.appendChild(п.узел); });
 
     // Дату спрашиваем на первом шаге — вместе с форматом это начало разговора
     if (шаг === 0) {
@@ -274,18 +317,25 @@
 
     var copy = el('button', 'btn btn--primary', brief.copy);
     copy.type = 'button';
-    copy.addEventListener('click', скопировать);
+    copy.addEventListener('click', function () {
+      скопировать();
+      очиститьПотом();
+    });
     actions.appendChild(copy);
 
     // Telegram не умеет подставлять текст в переписку по ссылке:
     // копируем в буфер и открываем чат, остаётся вставить.
     var tg = CONTENT.contacts.telegram;
     if (!isUnset(tg)) {
-      var tgBtn = el('button', 'btn btn--outline', brief.toTelegram);
-      tgBtn.type = 'button';
+      // Обычная ссылка, а не window.open: всплывающие окна браузеры
+      // блокируют, и чат заказчика просто не открывался.
+      var tgBtn = el('a', 'btn btn--outline', brief.toTelegram);
+      tgBtn.href = 'https://t.me/' + tg;
+      tgBtn.target = '_blank';
+      tgBtn.rel = 'noopener';
       tgBtn.addEventListener('click', function () {
-        скопировать();
-        window.open('https://t.me/' + tg, '_blank', 'noopener');
+        скопировать();       // текст в буфер: Telegram не принимает его ссылкой
+        очиститьПотом();
       });
       actions.appendChild(tgBtn);
     }
@@ -299,8 +349,26 @@
       waBtn.href = 'https://wa.me/' + wa;
       waBtn.addEventListener('click', function () {
         this.href = 'https://wa.me/' + wa + '?text=' + encodeURIComponent(area.value);
+        очиститьПотом();
       });
       actions.appendChild(waBtn);
+    }
+
+    // Заявка ушла — опросник начинает с чистого листа. Ждём секунду,
+    // чтобы копирование и переход в мессенджер успели сработать:
+    // на iOS переход отменяется, если страница меняется слишком рано.
+    function очиститьПотом() {
+      setTimeout(function () {
+        brief.groups.forEach(function (g) {
+          выбор[g.id] = g.type === 'many' ? [] : null;
+        });
+        уточнения = {};
+        дата = '';
+        try { localStorage.removeItem(КЛЮЧ); } catch (e) { /* нечего убирать */ }
+        шаг = 0;
+        показать();
+        byId('brief-status-line').textContent = brief.sentAndCleared;
+      }, 1000);
     }
 
     сцена.appendChild(actions);

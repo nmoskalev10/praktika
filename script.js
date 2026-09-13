@@ -731,9 +731,13 @@
     // Три ряда — столько несёт основная клавиатура баяна.
     // Каждый ряд сдвинут вправо, из-за этого ряды читаются наискось.
     var perRow = narrowPanel ? 4 : 8;
-    for (var r = 0; r < 3; r++) {
+    var РЯДОВ = 3;
+    for (var r = 0; r < РЯДОВ; r++) {
       var row = el('div', 'keys__row');
-      row.style.marginLeft = r * 11 + 'px';
+      row.style.setProperty('--per', perRow);
+      // Средний ряд стоит на месте, верхний и нижний уходят в стороны
+      // на одинаковую величину: косина остаётся, блок симметричен.
+      row.style.transform = 'translateX(' + ((r - (РЯДОВ - 1) / 2) * 7) + 'px)';
       for (var k = 0; k < perRow; k++) {
         var key = el('button', 'keys__btn');
         key.type = 'button';

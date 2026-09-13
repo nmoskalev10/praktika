@@ -244,6 +244,21 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 
 .btn--compact { min-height: 44px; padding: 10px 18px; font-size: 15px; }
 
+/* Второстепенная кнопка первого экрана: своя заливка и своя обводка.
+   Раньше это была ссылка с подчёркиванием — рядом с крупной кнопкой
+   заявки она читалась как служебная строчка, а не как действие. */
+.btn--ghost {
+  background: rgba(201, 162, 39, .16);
+  border: 1.5px solid var(--accent-soft);
+  color: var(--paper);
+}
+.btn--ghost:hover { background: rgba(201, 162, 39, .3); }
+.btn--ghost:active {
+  background: var(--accent-soft);
+  color: var(--ink);
+  border-color: var(--accent-soft);
+}
+
 .btn--outline {
   background: transparent;
   border: 1.5px solid var(--accent-soft);
@@ -340,7 +355,11 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   position: absolute;
   inset: 0;
   opacity: .09;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23c9a227' stroke-width='1.3'%3E%3Cpath d='M48 28L51.1 40.6L62.1 33.9L55.4 44.9L68 48L55.4 51.1L62.1 62.1L51.1 55.4L48 68L44.9 55.4L33.9 62.1L40.6 51.1L28 48L40.6 44.9L33.9 33.9L44.9 40.6Z'/%3E%3Ccircle cx='48' cy='48' r='5'/%3E%3Cpath d='M48 2l5 5-5 5-5-5z'/%3E%3Cpath d='M0 48l5 5-5 5-5-5z'/%3E%3Cpath d='M96 48l5 5-5 5-5-5z'/%3E%3Cpath d='M48 94l5 5-5 5-5-5z'/%3E%3C/g%3E%3C/svg%3E");
+  /* Плитка 96×96: розетка ровно в центре, четыре ромба ровно на серединах
+     сторон. Каждый краевой ромб нарисован половиной здесь и половиной
+     в соседней плитке, поэтому шва не видно, а узор выглядит одинаково
+     и слева направо, и сверху вниз. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23c9a227' stroke-width='1.3'%3E%3Cpath d='M48 28L51.1 40.6L62.1 33.9L55.4 44.9L68 48L55.4 51.1L62.1 62.1L51.1 55.4L48 68L44.9 55.4L33.9 62.1L40.6 51.1L28 48L40.6 44.9L33.9 33.9L44.9 40.6Z'/%3E%3Cpath d='M48 -5l5 5-5 5-5 -5z'/%3E%3Cpath d='M48 91l5 5-5 5-5 -5z'/%3E%3Cpath d='M0 43l5 5-5 5-5 -5z'/%3E%3Cpath d='M96 43l5 5-5 5-5 -5z'/%3E%3Ccircle cx='48' cy='48' r='5'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 96px 96px;
 }
 
@@ -355,10 +374,10 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
    На широком экране встают рядом — так читается, что это дуэт. */
 .duet {
   /* Слева струны, справа кнопки — два инструмента дуэта рядом.
-     На телефоне каждой половине достаётся мало места, поэтому
-     скрипт кладёт туда меньше струн и кнопок. */
+     Половины ровно равные: 1fr и 1fr. Раньше правая колонка была
+     шириной по содержимому, и панель выглядела перекошенной. */
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
   align-items: center;
   margin-top: 26px;
@@ -428,17 +447,25 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   display: grid;
   gap: 5px;
   align-content: center;
+  width: 100%;                    /* клавиатура занимает свою половину целиком */
 }
 
+/* Ряд — сетка из равных колонок, поэтому кнопки растягиваются
+   на всю ширину половины, сколько бы их ни было.
+   Сдвиг ряда задаёт скрипт через transform: средний ряд стоит на месте,
+   верхний и нижний уходят в разные стороны на одинаковую величину.
+   Так остаётся и косина настоящей клавиатуры, и симметрия блока. */
 .keys__row {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(var(--per, 4), 1fr);
   gap: 6px;
-  /* сдвиг ряда задаёт скрипт — из-за него ряды идут наискось */
 }
 
 .keys__btn {
-  width: 22px;
-  height: 22px;
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: 30px;
+  justify-self: center;
   padding: 0;
   /* Кнопки баяна — перламутровые: светлые и плотные. Полупрозрачные
      кружки на тёмном фоне читались как брак печати, а не как инструмент. */
@@ -496,7 +523,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   margin-bottom: 28px;
 }
 .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 22px; }
-.hero__actions .btn { flex: 1 1 auto; min-width: 220px; }
+.hero__actions .btn { flex: 1 1 auto; min-width: 160px; }
 
 .hero__figure { margin: 36px 0 0; }
 /* Маска-арка: та же форма, что у наличника. Второй этнический элемент. */
@@ -1008,6 +1035,21 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   transform-origin: left center;
   transition: transform 320ms cubic-bezier(.2, .7, .2, 1);
 }
+
+.briefPage__notice {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--accent-soft);
+  border-radius: var(--radius);
+  font-size: 15px;
+  color: var(--accent-soft);
+}
+.briefPage__notice:empty { display: none; }
+
+/* Поле у ответов вроде «Другое»: открывается под таблетками,
+   когда такой ответ выбран */
+.ask { display: grid; gap: 6px; margin: 16px 0 0; max-width: 520px; }
+.ask__label { font-size: 15px; font-weight: 600; }
 
 .step:focus { outline: none; }        /* фокус ставим программно, рамка не нужна */
 .step__question {
