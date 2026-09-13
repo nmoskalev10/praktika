@@ -399,6 +399,46 @@
     показать();
   });
 
+  /* --- Клавиатура не должна закрывать поле ---------------------------------
+     На телефоне экранная клавиатура выезжает поверх страницы и накрывает
+     то самое поле, в которое человек ткнул. Плюс снизу закреплена панель
+     шага — она тоже мешает. Убираем панель и подкручиваем страницу ровно
+     на недостающее. visualViewport — это то, что осталось видно поверх
+     клавиатуры. */
+
+  var viewport = window.visualViewport;
+  var stepbar = document.querySelector('.stepbar');
+  var вФокусе = null;
+
+  function поднятьНадКлавиатурой(поле) {
+    if (!поле) return;
+    var видимыйНиз = viewport ? viewport.offsetTop + viewport.height : window.innerHeight;
+    // Тянем строку целиком — вместе с подписью над полем
+    var строка = поле.closest('.ask') || поле.closest('.form__row') || поле;
+    var нехватка = строка.getBoundingClientRect().bottom + 16 - видимыйНиз;
+    if (нехватка > 0) window.scrollBy({ top: нехватка, behavior: 'smooth' });
+  }
+
+  document.addEventListener('focusin', function (event) {
+    var поле = event.target;
+    if (!поле.matches || !поле.matches('input, textarea')) return;
+    вФокусе = поле;
+    if (stepbar) stepbar.classList.add('is-away');
+    // Клавиатура выезжает не мгновенно: считать сразу бессмысленно
+    setTimeout(function () { поднятьНадКлавиатурой(вФокусе); }, 300);
+  });
+
+  document.addEventListener('focusout', function () {
+    вФокусе = null;
+    if (stepbar) stepbar.classList.remove('is-away');
+  });
+
+  // Клавиатура меняется на ходу: сменили язык, открыли эмодзи,
+  // появилась строка подсказок. Каждый раз проверяем заново.
+  if (viewport) {
+    viewport.addEventListener('resize', function () { поднятьНадКлавиатурой(вФокусе); });
+  }
+
   показать();
 
   // Тело страницы спрятано, пока тексты не расставлены, — иначе она

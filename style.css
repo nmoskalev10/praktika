@@ -393,12 +393,12 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 .string {
   display: flex;
   align-items: flex-end;
-  height: 20px;                    /* зона попадания курсора и пальца */
+  height: 9px;                     /* струны лежат плотно, как на инструменте */
   cursor: pointer;
 }
 .string svg {
   width: 100%;
-  height: 20px;
+  height: 9px;
   display: block;
   overflow: visible;
 }
@@ -411,7 +411,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   fill: none;
   /* Светлая латунь: тёмный акцент на тёмном дереве не читался вовсе */
   stroke: #e6d3a0;
-  stroke-width: 2;
+  stroke-width: 1.3;
   vector-effect: non-scaling-stroke;
   opacity: .95;
   transition: opacity 170ms ease, stroke 170ms ease;
@@ -424,13 +424,15 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 }
 .string.is-plucked path { animation: pluck-glow var(--ring, 900ms) ease-out both; }
 
+/* Струны стали лежать плотнее, поэтому и размах меньше: прежние 5 px
+   при шаге 9 px наезжали бы на соседнюю струну. */
 @keyframes pluck {
-  0%   { transform: translateY(-5px); }
-  18%  { transform: translateY(4px); }
-  36%  { transform: translateY(-2.6px); }
-  54%  { transform: translateY(1.6px); }
-  72%  { transform: translateY(-.9px); }
-  86%  { transform: translateY(.4px); }
+  0%   { transform: translateY(-2.6px); }
+  18%  { transform: translateY(2.1px); }
+  36%  { transform: translateY(-1.4px); }
+  54%  { transform: translateY(.85px); }
+  72%  { transform: translateY(-.5px); }
+  86%  { transform: translateY(.2px); }
   100% { transform: translateY(0); }
 }
 @keyframes pluck-glow {
@@ -445,9 +447,13 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 
 .keys {
   display: grid;
-  gap: 5px;
+  gap: 4px;
   align-content: center;
   width: 100%;                    /* клавиатура занимает свою половину целиком */
+  min-height: 90px;
+  /* Крайние ряды сдвинуты в стороны на 8 px — ровно столько отступа
+     им и нужно, иначе крайние кнопки срезает краем половины. */
+  padding-inline: 8px;
 }
 
 /* Ряд — сетка из равных колонок, поэтому кнопки растягиваются
@@ -457,25 +463,33 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
    Так остаётся и косина настоящей клавиатуры, и симметрия блока. */
 .keys__row {
   display: grid;
-  grid-template-columns: repeat(var(--per, 4), 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(var(--per, 8), 1fr);
+  gap: 4px;
 }
 
 .keys__btn {
   width: 100%;
   aspect-ratio: 1;
-  max-width: 30px;
+  max-width: 17px;
   justify-self: center;
   padding: 0;
   /* Кнопки баяна — перламутровые: светлые и плотные. Полупрозрачные
      кружки на тёмном фоне читались как брак печати, а не как инструмент. */
-  border: 1.5px solid rgba(42, 30, 20, .55);
+  border: 1px solid rgba(42, 30, 20, .55);
   border-radius: 50%;
   background: var(--paper);
-  box-shadow: inset 0 -2px 0 rgba(42, 30, 20, .18);
+  box-shadow: inset 0 -1px 0 rgba(42, 30, 20, .18);
   cursor: pointer;
   transition: background-color 160ms ease, transform 160ms ease, border-color 160ms ease;
 }
+/* На баяне ряды идут через один: перламутровый и чёрный.
+   Так их и различают на ощупь, не глядя на клавиатуру. */
+.keys__row--dark .keys__btn {
+  background: #1e1a16;
+  border-color: rgba(244, 233, 213, .35);
+  box-shadow: inset 0 -1px 0 rgba(244, 233, 213, .12);
+}
+
 .keys__btn:hover {
   background: var(--accent-soft);
   border-color: var(--accent-soft);
@@ -1067,6 +1081,14 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   background: var(--white);
   border-top: 1px solid var(--accent-soft);
   padding: 10px var(--gap) calc(10px + env(safe-area-inset-bottom));
+  transition: transform 220ms cubic-bezier(.2, .7, .2, 1);
+}
+/* Пока человек печатает, панель уезжает вниз: иначе она накрывает
+   поле ввода вместе с выехавшей клавиатурой. */
+.stepbar.is-away { transform: translateY(120%); pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .stepbar { transition: none; }
 }
 .stepbar__inner {
   display: flex;

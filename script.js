@@ -714,13 +714,15 @@
 
   (function buildStrings() {
     var box = byId('strings');
-    var count = narrowPanel ? 4 : 6;
+    // На настоящих гуслях струн полтора десятка и лежат они плотно.
+    // Четыре толстые полосы выглядели как забор, а не как инструмент.
+    var count = narrowPanel ? 10 : 14;
     for (var i = 0; i < count; i++) {
       var row = el('div', 'string');
       // В покое струна почти прямая. Нижние струны гудят дольше.
-      row.style.setProperty('--ring', (760 + i * 110) + 'ms');
-      row.innerHTML = '<svg viewBox="0 0 300 20" preserveAspectRatio="none">' +
-        '<path d="M0 19 Q150 18.4 300 19"/></svg>';
+      row.style.setProperty('--ring', (700 + i * 70) + 'ms');
+      row.innerHTML = '<svg viewBox="0 0 300 9" preserveAspectRatio="none">' +
+        '<path d="M0 8 Q150 7.6 300 8"/></svg>';
       box.appendChild(row);
       stringRows.push(row);
     }
@@ -730,14 +732,17 @@
     var box = byId('keys');
     // Три ряда — столько несёт основная клавиатура баяна.
     // Каждый ряд сдвинут вправо, из-за этого ряды читаются наискось.
-    var perRow = narrowPanel ? 4 : 8;
-    var РЯДОВ = 3;
+    // У настоящего баяна кнопки мелкие и рядов пять. Крупные кружки
+    // в три ряда читались как калькулятор, а не как клавиатура.
+    var perRow = narrowPanel ? 8 : 12;
+    var РЯДОВ = 5;
     for (var r = 0; r < РЯДОВ; r++) {
-      var row = el('div', 'keys__row');
+      // Ряды чередуются светлый — тёмный, как на настоящем инструменте
+      var row = el('div', 'keys__row ' + (r % 2 ? 'keys__row--dark' : 'keys__row--pearl'));
       row.style.setProperty('--per', perRow);
       // Средний ряд стоит на месте, верхний и нижний уходят в стороны
       // на одинаковую величину: косина остаётся, блок симметричен.
-      row.style.transform = 'translateX(' + ((r - (РЯДОВ - 1) / 2) * 7) + 'px)';
+      row.style.transform = 'translateX(' + ((r - (РЯДОВ - 1) / 2) * 4) + 'px)';
       for (var k = 0; k < perRow; k++) {
         var key = el('button', 'keys__btn');
         key.type = 'button';
