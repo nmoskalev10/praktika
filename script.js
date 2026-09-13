@@ -433,8 +433,54 @@
   byId('f-name').placeholder = formText.fields.name.placeholder;
   // Переключатель «телефон / Telegram». Телефон выбран сразу: так
   // большинству не приходится делать лишнее движение перед вводом.
+  var contactField = byId('f-contact');
+  var contactMode = formText.fields.contact.modes[0].id;
+
+  // Приводим набранное к российскому номеру. Человек начинает по-разному:
+  // с 8, с 7, с +7 или сразу с кода оператора — результат должен быть один.
+  // Кодов операторов, начинающихся с семёрки, в России нет, поэтому
+  // ведущую семёрку можно смело считать кодом страны.
+  function ruPhone(raw) {
+    var digits = raw.replace(/\D/g, '');
+    if (!digits) return '';
+
+    if (digits.charAt(0) === '8') {
+      digits = '7' + digits.slice(1);       // восьмёрка — та же семёрка, по-старому
+    } else if (digits.charAt(0) !== '7') {
+      digits = '7' + digits;                // начали с кода оператора — семёрку дописываем сами
+    }
+    digits = digits.slice(0, 11);           // семёрка и десять цифр, длиннее номеров нет
+
+    // Разделители ставим только перед цифрами, которые уже набраны:
+    // иначе после хвостового пробела не сработает удаление.
+    var tail = digits.slice(1);
+    var out = '+7';
+    if (tail.length) out += ' ' + tail.slice(0, 3);
+    if (tail.length > 3) out += ' ' + tail.slice(3, 6);
+    if (tail.length > 6) out += '-' + tail.slice(6, 8);
+    if (tail.length > 8) out += '-' + tail.slice(8, 10);
+    return out;
+  }
+
+  function digitsOf(value) {
+    return value.replace(/\D/g, '').length;
+  }
+
+  contactField.addEventListener('input', function () {
+    if (contactMode !== 'phone') return;
+    var atEnd = this.selectionStart === this.value.length;
+    var formatted = ruPhone(this.value);
+    if (formatted === this.value) return;
+    this.value = formatted;
+    // Присвоение value сбрасывает курсор в конец. Если человек правил
+    // середину номера, возвращаем курсор примерно туда, где он был.
+    if (!atEnd) {
+      var at = Math.min(this.selectionStart, formatted.length);
+      this.setSelectionRange(at, at);
+    }
+  });
+
   (function buildContactModes() {
-    var field = byId('f-contact');
     var box = byId('contact-modes');
 
     formText.fields.contact.modes.forEach(function (mode, index) {
@@ -447,22 +493,25 @@
         [].forEach.call(box.children, function (other) {
           other.setAttribute('aria-checked', other === button ? 'true' : 'false');
         });
-        field.placeholder = mode.placeholder;
+        contactMode = mode.id;
+        contactField.placeholder = mode.placeholder;
         // Набранное не стираем: человек мог начать писать и передумать.
         if (mode.id === 'phone') {
-          field.setAttribute('inputmode', 'tel');
-          field.autocomplete = 'tel';
+          contactField.setAttribute('inputmode', 'tel');
+          contactField.autocomplete = 'tel';
+          // Уже набранное приводим к номеру сразу, не дожидаясь правки
+          contactField.value = ruPhone(contactField.value);
         } else {
-          field.removeAttribute('inputmode');   // нужна обычная клавиатура
-          field.autocomplete = 'off';
+          contactField.removeAttribute('inputmode');   // нужна обычная клавиатура
+          contactField.autocomplete = 'off';
         }
-        field.focus();
+        contactField.focus();
       });
 
       box.appendChild(button);
     });
 
-    field.placeholder = formText.fields.contact.modes[0].placeholder;
+    contactField.placeholder = formText.fields.contact.modes[0].placeholder;
   })();
 
   // У каждого поля своё сообщение: оно объясняет, чего не хватает,
@@ -495,8 +544,15 @@
     var firstBad = null;
     required.forEach(function (field) {
       var bad = field.input.value.trim() === '';
+      var message = field.message;
+      // Недобранный номер хуже пустого поля: заявка уйдёт, а перезвонить
+      // будет некуда. Считаем цифры: семёрка и десять после неё.
+      if (!bad && field.input === contactField && contactMode === 'phone' && digitsOf(field.input.value) < 11) {
+        bad = true;
+        message = ui.errors.phone;
+      }
       field.input.setAttribute('aria-invalid', bad ? 'true' : 'false');
-      field.hint.textContent = bad ? field.message : '';
+      field.hint.textContent = bad ? message : '';
       field.hint.hidden = !bad;
       if (bad) {
         field.input.setAttribute('aria-describedby', field.hint.id);
@@ -574,8 +630,41 @@
   // Пока человек заполняет форму, липкая кнопка уходит: на телефоне
   // она оказывается ровно над полем, зажатым клавиатурой. В блоке
   // контактов она и не нужна — там своя кнопка отправки.
-  form.addEventListener('focusin', function () { sticky.classList.add('is-away'); });
-  form.addEventListener('focusout', function () { sticky.classList.remove('is-away'); });
+  // Экранная клавиатура выезжает поверх страницы и часто закрывает то
+  // самое поле, в которое человек только что ткнул. visualViewport —
+  // это та часть страницы, что осталась видна поверх клавиатуры.
+  // Если поле оказалось ниже её нижнего края, подкручиваем страницу
+  // ровно на недостающее, не больше.
+  var viewport = window.visualViewport;
+  var focusedField = null;
+
+  function keepAboveKeyboard(field) {
+    if (!field) return;
+    var visibleBottom = viewport ? viewport.offsetTop + viewport.height : window.innerHeight;
+    // Тянем не само поле, а строку целиком — вместе с подписью над ним
+    var row = field.closest('.form__row') || field;
+    var missing = row.getBoundingClientRect().bottom + 16 - visibleBottom;
+    if (missing > 0) window.scrollBy({ top: missing, behavior: 'smooth' });
+  }
+
+  form.addEventListener('focusin', function (event) {
+    sticky.classList.add('is-away');
+    focusedField = event.target;
+    // Клавиатура выезжает не мгновенно: считать сразу бессмысленно,
+    // экран ещё не ужался. 300 мс — обычная длина этой анимации.
+    setTimeout(function () { keepAboveKeyboard(focusedField); }, 300);
+  });
+
+  form.addEventListener('focusout', function () {
+    sticky.classList.remove('is-away');
+    focusedField = null;
+  });
+
+  // Клавиатура может смениться на ходу: переключили язык, открылся
+  // блок эмодзи, появилась строка подсказок. Каждый раз проверяем заново.
+  if (viewport) {
+    viewport.addEventListener('resize', function () { keepAboveKeyboard(focusedField); });
+  }
 
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(function (entries) {
