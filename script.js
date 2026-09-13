@@ -428,7 +428,39 @@
   });
 
   byId('f-name').placeholder = formText.fields.name.placeholder;
-  byId('f-contact').placeholder = formText.fields.contact.placeholder;
+  // Переключатель «телефон / Telegram». Телефон выбран сразу: так
+  // большинству не приходится делать лишнее движение перед вводом.
+  (function buildContactModes() {
+    var field = byId('f-contact');
+    var box = byId('contact-modes');
+
+    formText.fields.contact.modes.forEach(function (mode, index) {
+      var button = el('button', 'modes__btn', mode.label);
+      button.type = 'button';
+      button.setAttribute('role', 'radio');
+      button.setAttribute('aria-checked', index === 0 ? 'true' : 'false');
+
+      button.addEventListener('click', function () {
+        [].forEach.call(box.children, function (other) {
+          other.setAttribute('aria-checked', other === button ? 'true' : 'false');
+        });
+        field.placeholder = mode.placeholder;
+        // Набранное не стираем: человек мог начать писать и передумать.
+        if (mode.id === 'phone') {
+          field.setAttribute('inputmode', 'tel');
+          field.autocomplete = 'tel';
+        } else {
+          field.removeAttribute('inputmode');   // нужна обычная клавиатура
+          field.autocomplete = 'off';
+        }
+        field.focus();
+      });
+
+      box.appendChild(button);
+    });
+
+    field.placeholder = formText.fields.contact.modes[0].placeholder;
+  })();
 
   // У каждого поля своё сообщение: оно объясняет, чего не хватает,
   // а не просто красит рамку.
@@ -536,6 +568,18 @@
   var sticky = byId('sticky');
   var hero = byId('top');
 
+  // Пока человек заполняет форму, липкая кнопка уходит: на телефоне
+  // она оказывается ровно над полем, зажатым клавиатурой. В блоке
+  // контактов она и не нужна — там своя кнопка отправки.
+  form.addEventListener('focusin', function () { sticky.classList.add('is-away'); });
+  form.addEventListener('focusout', function () { sticky.classList.remove('is-away'); });
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      sticky.classList.toggle('is-away', entries[0].isIntersecting);
+    }, { threshold: .12 }).observe(byId('contacts'));
+  }
+
   function showSticky() {
     sticky.hidden = false;
     document.body.classList.add('has-sticky');
@@ -560,13 +604,17 @@
 
   var stringRows = [];
 
+  // Половины стоят рядом, поэтому на телефоне каждой достаётся
+  // около 150 px: там струн и кнопок меньше, иначе получается каша.
+  var narrowPanel = window.matchMedia('(max-width: 699px)').matches;
+
   (function buildStrings() {
     var box = byId('strings');
-    for (var i = 0; i < 6; i++) {
+    var count = narrowPanel ? 4 : 6;
+    for (var i = 0; i < count; i++) {
       var row = el('div', 'string');
-      // Прогиб почти нулевой — в покое это ровная линия. Размах щипка
-      // задаёт --amp: у нижних струн он больше.
-      row.style.setProperty('--amp', 14 + i * 4);
+      // В покое струна почти прямая. Нижние струны гудят дольше.
+      row.style.setProperty('--ring', (760 + i * 110) + 'ms');
       row.innerHTML = '<svg viewBox="0 0 300 20" preserveAspectRatio="none">' +
         '<path d="M0 19 Q150 18.4 300 19"/></svg>';
       box.appendChild(row);
@@ -576,12 +624,13 @@
 
   (function buildKeys() {
     var box = byId('keys');
-    // Три ряда по восемь кнопок — столько несёт основная клавиатура баяна.
+    // Три ряда — столько несёт основная клавиатура баяна.
     // Каждый ряд сдвинут вправо, из-за этого ряды читаются наискось.
+    var perRow = narrowPanel ? 4 : 8;
     for (var r = 0; r < 3; r++) {
       var row = el('div', 'keys__row');
       row.style.marginLeft = r * 11 + 'px';
-      for (var k = 0; k < 8; k++) {
+      for (var k = 0; k < perRow; k++) {
         var key = el('button', 'keys__btn');
         key.type = 'button';
         key.tabIndex = -1;          // украшение: клавиатурой по нему не ходят

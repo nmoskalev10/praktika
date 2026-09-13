@@ -203,10 +203,11 @@
             <select class="form__input" id="f-type" name="event_type"></select>
           </p>
           <p class="form__row">
-            <label class="form__label" for="f-contact" data-text="contacts.form.fields.contact.label"></label>
-            <!-- Обычная клавиатура: в это поле пишут и номер, и логин
-                 в Telegram, а цифровая не даёт набрать буквы. -->
-            <input class="form__input" id="f-contact" name="contact" type="text" autocomplete="tel" spellcheck="false" required>
+            <label class="form__label" id="f-contact-label" for="f-contact" data-text="contacts.form.fields.contact.label"></label>
+            <!-- Переключатель заполняет скрипт. От выбора зависит, какая
+                 клавиатура откроется: цифровая для номера, обычная для ника. -->
+            <span class="modes" id="contact-modes" role="radiogroup" aria-labelledby="f-contact-label"></span>
+            <input class="form__input" id="f-contact" name="contact" type="text" autocomplete="tel" inputmode="tel" spellcheck="false" required>
           </p>
           <button class="btn btn--primary form__submit" type="submit" id="form-submit" data-text="contacts.form.submit"></button>
           <p class="form__status" id="form-status" role="status" aria-live="polite"></p>

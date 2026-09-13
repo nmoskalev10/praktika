@@ -167,7 +167,9 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 40
 /* Наведение чуть приподнимает кнопку, нажатие — вжимает,
    как настоящую клавишу. Двигается только transform. */
 .btn:hover { background: #8d1c19; transform: translateY(-2px); }
-.btn:active { background: #741612; transform: translateY(0) scale(.97); }
+/* Вжатие заметное: на телефоне наведения нет, а палец закрывает
+   половину кнопки — слабый отклик там просто не виден. */
+.btn:active { background: #6b1410; transform: translateY(0) scale(.94); }
 
 /* На тёмном фоне тёмно-красная кнопка сливается — выворачиваем наизнанку */
 .hero .btn--primary,
@@ -175,7 +177,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 40
 .hero .btn--primary:hover,
 .section--ink .btn--primary:hover { background: var(--white); }
 .hero .btn--primary:active,
-.section--ink .btn--primary:active { background: var(--accent-soft); color: var(--accent); }
+.section--ink .btn--primary:active { background: var(--accent-soft); color: var(--ink); }
 
 .btn--compact { min-height: 44px; padding: 10px 18px; font-size: 15px; }
 
@@ -220,7 +222,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 40
 
 .header {
   position: sticky; top: 0; z-index: 40;
-  background: rgba(42, 30, 20, .96);
+  background: var(--ink);
   color: var(--paper);
 }
 .header__inner {
@@ -287,16 +289,21 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 40
    если поделить 360 px пополам, струны превращаются в обрубки.
    На широком экране встают рядом — так читается, что это дуэт. */
 .duet {
+  /* Слева струны, справа кнопки — два инструмента дуэта рядом.
+     На телефоне каждой половине достаётся мало места, поэтому
+     скрипт кладёт туда меньше струн и кнопок. */
   display: grid;
-  gap: 14px;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: center;
   margin-top: 26px;
-  max-width: 430px;
+  max-width: 460px;
 }
 
 .strings {
   /* Место под шесть струн занято заранее: скрипт добавляет их после
      загрузки, и без этой высоты страница дёрнулась бы вниз. */
-  min-height: 120px;
+  min-height: 80px;
 }
 
 .string {
@@ -310,12 +317,12 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 40
   height: 20px;
   display: block;
   overflow: visible;
-  /* В покое масштаб единичный: струна нарисована почти прямой и потому
-     выглядит чистой яркой линией. Сплющенная дуга размазывалась
-     сглаживанием и темнела втрое — выглядела грязным штрихом. */
-  transform: scaleY(1);
-  transform-origin: bottom center;
 }
+/* Щипок: струна дрожит по вертикали и вспыхивает, затем гаснет.
+   Пробовал два других пути и оба отпали: растягивание снаружи SVG
+   утолщало линию вместе с формой (струна раздувалась в белую полосу),
+   а анимация самой кривой в Chromium к отрисовке не применяется.
+   Сдвиг работает везде и вёрстку не трогает. */
 .string path {
   fill: none;
   /* Светлая латунь: тёмный акцент на тёмном дереве не читался вовсе */
@@ -327,17 +334,24 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 40
 }
 .string:hover path { opacity: 1; stroke: var(--white); }
 
-.string.is-plucked svg { animation: pluck 880ms cubic-bezier(.3, .55, .35, 1) both; }
+/* Толстые струны гудят дольше тонких — длительность задаёт скрипт. */
+.string.is-plucked svg {
+  animation: pluck var(--ring, 900ms) cubic-bezier(.25, .6, .3, 1) both;
+}
+.string.is-plucked path { animation: pluck-glow var(--ring, 900ms) ease-out both; }
 
-/* Щипок растягивает еле заметный прогиб в настоящую волну и гасит её.
-   --amp своя у каждой струны: нижние ходят сильнее. */
 @keyframes pluck {
-  0%   { transform: scaleY(var(--amp)); }
-  20%  { transform: scaleY(calc(var(--amp) * -.58)); }
-  42%  { transform: scaleY(calc(var(--amp) * .32)); }
-  62%  { transform: scaleY(calc(var(--amp) * -.17)); }
-  80%  { transform: scaleY(calc(var(--amp) * .07)); }
-  100% { transform: scaleY(1); }
+  0%   { transform: translateY(-5px); }
+  18%  { transform: translateY(4px); }
+  36%  { transform: translateY(-2.6px); }
+  54%  { transform: translateY(1.6px); }
+  72%  { transform: translateY(-.9px); }
+  86%  { transform: translateY(.4px); }
+  100% { transform: translateY(0); }
+}
+@keyframes pluck-glow {
+  0%   { stroke: #fffaf0; opacity: 1; }
+  100% { stroke: #e6d3a0; opacity: .95; }
 }
 
 /* --- 7b. Кнопки баяна ----------------------------------------------------
@@ -558,10 +572,10 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 40
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 170ms ease, color 170ms ease, border-color 170ms ease;
+  transition: background-color 170ms ease, color 170ms ease, border-color 170ms ease, transform 170ms ease;
 }
 .sample__btn:hover { background: var(--accent); color: var(--white); }
-.sample__btn:active { background: #741612; color: var(--white); border-color: #741612; }
+.sample__btn:active { background: #6b1410; color: var(--white); border-color: #6b1410; transform: scale(.94); }
 .sample__btn[disabled] {
   border-color: var(--accent-soft);
   color: var(--muted);
@@ -716,6 +730,29 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 40
 .form__label { font-size: 15px; font-weight: 600; }
 .form__hint { font-size: 13px; color: var(--accent-soft); }
 
+/* Переключатель способа связи. Выбор меняет клавиатуру на телефоне. */
+.modes { display: flex; gap: 8px; }
+.modes__btn {
+  min-height: 44px;
+  padding: 8px 18px;
+  border: 1.5px solid var(--accent-soft);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--paper);
+  font-family: var(--font-text);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+.modes__btn:hover { background: rgba(253, 248, 238, .12); }
+.modes__btn:active { transform: scale(.94); }
+.modes__btn[aria-checked="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  color: var(--ink);
+}
+
 .form__input {
   min-height: 52px;
   padding: 12px 14px;
@@ -762,7 +799,12 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 40
 
 /* --- 15. Липкая кнопка связи ---------------------------------------------- */
 
+/* Панель уезжает вниз, когда мешает: при вводе в форму и на блоке
+   контактов. Не display:none — так возвращается она плавно. */
+.sticky.is-away { transform: translateY(120%); pointer-events: none; }
+
 .sticky {
+  transition: transform 220ms cubic-bezier(.2, .7, .2, 1);
   position: fixed;
   left: 0; right: 0; bottom: 0;
   z-index: 50;
@@ -818,8 +860,8 @@ body.has-sticky { padding-bottom: 84px; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 
-  .string.is-plucked svg { animation: none; }
-  .string svg { transform: scaleY(1); }
+  .string.is-plucked svg,
+  .string.is-plucked path { animation: none; }
 
   .animate .reveal,
   .animate .reveal.is-visible,
@@ -831,6 +873,7 @@ body.has-sticky { padding-bottom: 84px; }
   }
 
   .sample__bar { transition: none; }
+  .sticky { transition: none; }
   .btn:hover, .btn:active { transform: none; }
   .link-underline:hover::after { animation: none; }
   .video__btn:hover .video__play { transform: none; }
