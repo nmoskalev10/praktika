@@ -8,13 +8,31 @@
 
 /* --- 1. Токены: цвета, шрифты, размеры ----------------------------------- */
 
-/* Подменный шрифт на те доли секунды, пока грузится заголовочный.
-   Без подгонки страница дёргалась бы вниз в момент подмены.
-   Коэффициент подобран замером — см. ниже. */
+/* Подменные шрифты на те доли секунды, пока грузятся заголовочные.
+   Каждый берёт метрики системного Georgia и растягивается коэффициентом
+   size-adjust так, чтобы строка занимала ту же ширину, что и настоящий
+   шрифт. Без этого в момент подмены текст перескакивает и страница
+   дёргается — поисковики считают это дефектом (CLS).
+   Коэффициенты не выдуманы: замерены в браузере, ширина одной и той же
+   строки в настоящем шрифте делится на ширину в Georgia. */
 @font-face {
   font-family: 'Monomakh fallback';
   src: local('Georgia'), local('Times New Roman'), local('Liberation Serif'), local('Tinos');
-  size-adjust: 100%;
+  size-adjust: 102%;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Oranienbaum fallback';
+  src: local('Georgia'), local('Times New Roman'), local('Liberation Serif'), local('Tinos');
+  size-adjust: 98%;
+  font-display: swap;
+}
+/* Ruslan Display — жирный плакатный шрифт, он в полтора раза шире
+   Georgia, отсюда 160%. */
+@font-face {
+  font-family: 'Ruslan Display fallback';
+  src: local('Georgia'), local('Times New Roman'), local('Liberation Serif'), local('Tinos');
+  size-adjust: 160%;
   font-display: swap;
 }
 
@@ -32,7 +50,19 @@
   --gap: 20px;
   --radius: 8px;
 
+  /* Три заголовочных шрифта, у каждого своя работа.
+     display — только главный заголовок первого экрана: уставное
+     письмо, как в старых рукописях. Читается медленно, поэтому
+     больше нигде не стоит.
+     heading — все остальные заголовки: узкая антиква, влезает
+     в 360 px и не спорит с первым экраном.
+     brand — только название дуэта в шапке и подвале: плакатный
+     шрифт, он и держит русский характер.
+     Текст абзацев везде один — Golos Text. Декоративный шрифт
+     в абзацах убивает читаемость на телефоне. */
   --font-display: 'Monomakh', 'Monomakh fallback', Georgia, 'Times New Roman', serif;
+  --font-heading: 'Oranienbaum', 'Oranienbaum fallback', Georgia, 'Times New Roman', serif;
+  --font-brand: 'Ruslan Display', 'Ruslan Display fallback', Georgia, 'Times New Roman', serif;
   --font-text: 'Golos Text', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   color-scheme: light;
@@ -74,7 +104,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 
 p { margin: 0 0 1em; }
 
-h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 400; line-height: 1.1; text-wrap: balance; }
+h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 400; line-height: 1.1; text-wrap: balance; }
 
 :target { scroll-margin-top: 84px; }
 
@@ -237,10 +267,12 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 40
   display: inline-flex;
   align-items: center;
   min-height: 44px;                /* палец должен попадать по ссылке */
-  font-family: var(--font-display);
+  font-family: var(--font-brand);
   font-weight: 400;
   font-size: 17px;
-  letter-spacing: -.01em;
+  /* Плакатный шрифт и так плотный: сжимать его нельзя, буквы слипнутся.
+     Наоборот, чуть разводим — так читается название. */
+  letter-spacing: .02em;
   color: var(--paper);
   text-decoration: none;
   margin-right: auto;
@@ -518,7 +550,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 40
 }
 .format__name {
   margin: 0;
-  font-family: var(--font-display);
+  font-family: var(--font-heading);
   font-size: 21px;
   font-weight: 400;
   flex: 1 1 auto;
@@ -544,7 +576,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 40
 .repertoire { display: grid; gap: 32px; margin-top: 28px; }
 
 .rep__name {
-  font-family: var(--font-display);
+  font-family: var(--font-heading);
   font-size: 20px;
   font-weight: 400;
   margin: 0 0 10px;
@@ -794,7 +826,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-display); font-weight: 40
   font-size: 15px;
 }
 .footer__inner p { margin: 0 0 6px; }
-.footer__brand { font-family: var(--font-display); font-weight: 400; color: var(--paper); }
+.footer__brand { font-family: var(--font-brand); font-weight: 400; color: var(--paper); }
 .footer__copy { font-variant-numeric: tabular-nums; }
 
 /* --- 15. Липкая кнопка связи ---------------------------------------------- */
