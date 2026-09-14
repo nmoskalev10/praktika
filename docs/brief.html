@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+<meta name="theme-color" content="#2a1e14">
+
+<!-- Заголовок и описание дублируются здесь для поисковиков и мессенджеров:
+     их роботы не запускают скрипты. Правите в content.js (раздел 7а) —
+     продублируйте сюда. -->
+<title>Собрать выступление и узнать бюджет — дуэт «In stile russo»</title>
+<meta name="description" content="Отметьте формат, длительность, площадку и дополнения — покажем примерный бюджет выступления дуэта баяна и гуслей и соберём готовый текст заявки.">
+<!-- Опросник не нужен в поиске: на него приходят с главной страницы -->
+<meta name="robots" content="noindex, nofollow">
+
+<link rel="icon" href="favicon/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="favicon/apple-touch-icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600&family=Monomakh&family=Oranienbaum&family=Ruslan+Display&display=swap">
+<link rel="stylesheet" href="style.css">
+
+<script src="content.js" defer></script>
+<script src="brief.js" defer></script>
+
+<!-- Страховка: без скриптов или при ошибке в них страница всё равно
+     показывается, просто без подставленных текстов. -->
+<noscript><style>body { visibility: visible !important; }</style></noscript>
+<script>setTimeout(function () { document.documentElement.classList.add('ready'); }, 2000);</script>
+</head>
+
+<body class="page--brief">
+
+<header class="header">
+  <div class="header__inner">
+    <a class="brand" href="index.html" data-text="brand.name" translate="no"></a>
+    <a class="link-underline header__back" href="index.html" data-text="brief.backToSite"></a>
+  </div>
+</header>
+
+<main class="briefPage" id="main">
+  <div class="wrap">
+
+    <!-- Полоска заполнения: она же показывает, сколько осталось -->
+    <div class="progress">
+      <p class="progress__count" id="progress-count" role="status" aria-live="polite"></p>
+      <div class="progress__track">
+        <div class="progress__bar" id="progress-bar"></div>
+      </div>
+    </div>
+
+    <!-- Сообщение после отправки: живёт отдельно от вопроса,
+         который скрипт перерисовывает на каждом шаге -->
+    <p class="briefPage__notice" id="brief-status-line" role="status" aria-live="polite"></p>
+
+    <!-- Сюда скрипт кладёт текущий вопрос или итог -->
+    <div class="step" id="step" tabindex="-1"></div>
+
+  </div>
+</main>
+
+<!-- Управление всегда под рукой: вилка пересчитывается на каждое нажатие -->
+<div class="stepbar">
+  <div class="stepbar__inner">
+    <p class="stepbar__sum" id="running-sum"></p>
+    <div class="stepbar__buttons">
+      <button class="btn btn--outline btn--compact" type="button" id="step-back" data-text="brief.back" hidden></button>
+      <button class="btn btn--primary" type="button" id="step-next"></button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

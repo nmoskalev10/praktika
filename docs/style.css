@@ -1,0 +1,1316 @@
+/* ============================================================================
+   In stile russo — стили.
+   Порядок: токены → сброс → типографика → кнопки → блоки сверху вниз →
+   планшет/десктоп в самом конце.
+   Верстка мобильная: базовые правила написаны под экран 360 px,
+   медиазапросы только расширяют.
+   ============================================================================ */
+
+/* --- 1. Токены: цвета, шрифты, размеры ----------------------------------- */
+
+/* Подменные шрифты на те доли секунды, пока грузятся заголовочные.
+   Каждый берёт метрики системного Georgia и растягивается коэффициентом
+   size-adjust так, чтобы строка занимала ту же ширину, что и настоящий
+   шрифт. Без этого в момент подмены текст перескакивает и страница
+   дёргается — поисковики считают это дефектом (CLS).
+   Коэффициенты не выдуманы: замерены в браузере, ширина одной и той же
+   строки в настоящем шрифте делится на ширину в Georgia. */
+@font-face {
+  font-family: 'Monomakh fallback';
+  src: local('Georgia'), local('Times New Roman'), local('Liberation Serif'), local('Tinos');
+  size-adjust: 102%;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Oranienbaum fallback';
+  src: local('Georgia'), local('Times New Roman'), local('Liberation Serif'), local('Tinos');
+  size-adjust: 98%;
+  font-display: swap;
+}
+/* Ruslan Display — жирный плакатный шрифт, он в полтора раза шире
+   Georgia, отсюда 160%. */
+@font-face {
+  font-family: 'Ruslan Display fallback';
+  src: local('Georgia'), local('Times New Roman'), local('Liberation Serif'), local('Tinos');
+  size-adjust: 160%;
+  font-display: swap;
+}
+
+:root {
+  /* Палитра снята с самих гуслей: медовая дека из клёна, тёмная резьба
+     по краю, латунные струны. */
+  --ink: #2a1e14;          /* тёмное дерево, цвет резьбы и прожига */
+  --paper: #f4e9d5;        /* фон страницы — светлая медовая дека */
+  --white: #fdf8ee;        /* плашки и поля, самый светлый тон деки */
+  --accent: #a8231f;       /* русский красный с орнаментов: кнопки, ссылки, акцент */
+  --accent-soft: #c9a227;  /* латунь струн: линии, узор, струны */
+  --muted: #6b5644;        /* второстепенный текст */
+
+  --wrap: 1120px;
+  --gap: 20px;
+  /* Шаг панели инструментов: одна струна слева и один ряд кнопок справа
+     занимают ровно столько. Отсюда струны и ряды идут на одной высоте. */
+  --panel-step: 20px;             /* расстояние между соседними рядами */
+  --panel-key: 14px;              /* размер кнопки, он же высота ряда */
+  --panel-gap: 4px;               /* просвет между кнопками по горизонтали */
+  --radius: 8px;
+
+  /* Три заголовочных шрифта, у каждого своя работа.
+     display — только главный заголовок первого экрана: уставное
+     письмо, как в старых рукописях. Читается медленно, поэтому
+     больше нигде не стоит.
+     heading — все остальные заголовки: узкая антиква, влезает
+     в 360 px и не спорит с первым экраном.
+     brand — только название дуэта в шапке и подвале: плакатный
+     шрифт, он и держит русский характер.
+     Текст абзацев везде один — Golos Text. Декоративный шрифт
+     в абзацах убивает читаемость на телефоне. */
+  --font-display: 'Monomakh', 'Monomakh fallback', Georgia, 'Times New Roman', serif;
+  --font-heading: 'Oranienbaum', 'Oranienbaum fallback', Georgia, 'Times New Roman', serif;
+  --font-brand: 'Ruslan Display', 'Ruslan Display fallback', Georgia, 'Times New Roman', serif;
+  --font-text: 'Golos Text', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  color-scheme: light;
+}
+
+/* Тексты подставляет скрипт, поэтому долю секунды разметка пуста.
+   Прячем её на это время: иначе страница успевает нарисоваться пустой,
+   а потом резко вырастает — поисковики считают это дефектом.
+   Класс ready ставится скриптом; если скрипты выключены или сломались,
+   страницу открывают запасные правила в index.html. */
+html:not(.ready) body { visibility: hidden; }
+
+/* --- 2. Сброс ------------------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;             /* страховка от горизонтального скролла */
+  touch-action: manipulation;      /* убирает задержку двойного тапа */
+  /* Браузер на телефоне сам рисует серый прямоугольник по касанию —
+     он не знает формы элемента и портит круглые точки и тонкие струны.
+     Выключаем: у каждого элемента ниже есть собственный отклик на нажатие. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+ul, ol { margin: 0; padding: 0; list-style: none; }
+
+[hidden] { display: none !important; }
+
+p { margin: 0 0 1em; }
+
+h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 400; line-height: 1.1; text-wrap: balance; }
+
+:target { scroll-margin-top: 84px; }
+
+/* --- 3. Доступность ------------------------------------------------------- */
+
+/* Видимый фокус на всём, что можно нажать с клавиатуры */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+/* На тёмных экранах красная обводка не видна — делаем светлую */
+.hero :focus-visible,
+.section--ink :focus-visible,
+.footer :focus-visible { outline-color: var(--white); }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute; left: 8px; top: -60px; z-index: 100;
+  padding: 12px 16px; border-radius: var(--radius);
+  background: var(--white); color: var(--accent);
+  font-weight: 600; text-decoration: none;
+  transition: top 150ms ease;
+}
+.skip-link:focus-visible { top: 8px; }
+
+/* --- 4. Сетка ------------------------------------------------------------- */
+
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding-inline: var(--gap);
+}
+
+.section { padding-block: 48px; }
+.section--paper { background: var(--white); }
+.section--ink { background: var(--ink); color: var(--paper); }
+
+.section__title { font-size: clamp(26px, 7vw, 40px); }
+.section__intro { max-width: 62ch; color: var(--muted); }
+.section--ink .section__intro { color: var(--accent-soft); }
+.section__note { margin-top: 24px; font-size: 14px; color: var(--muted); }
+.section--ink .section__note { color: var(--accent-soft); }
+
+.subtitle {
+  margin-top: 40px;
+  font-family: var(--font-text);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* --- 4a. Орнаментальная лента ---------------------------------------------
+   Ромбы с отростками — мотив с русской набойки и вышивки. Лента режет
+   страницу на части и объявляет смену раздела. Рисуется одним фоном,
+   никаких картинок грузить не нужно. */
+.band {
+  height: 30px;
+  background-color: var(--accent);
+  position: relative;
+  overflow: hidden;                 /* уезжающий узор не вылезает за края */
+}
+
+/* Сам узор лежит в псевдоэлементе и медленно едет вбок.
+   Псевдоэлемент шире полосы ровно на одну плитку — 60 px. Сдвинувшись
+   на эту плитку, картинка совпадает сама с собой, поэтому шва не видно
+   и движение выглядит бесконечным. Скорость 60 px за 5 с: узор идёт
+   медленнее, чем читается текст, и не отвлекает.
+   Двигается transform — браузер не пересчитывает вёрстку, а только
+   сдвигает готовый слой. */
+.band::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: calc(100% + 60px);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='30' viewBox='0 0 60 30'%3E%3Cg fill='none' stroke='%23f4e9d5' stroke-width='1.6'%3E%3Cpath d='M30 4L42 15L30 26L18 15Z'/%3E%3Cpath d='M30 11L34 15L30 19L26 15Z'/%3E%3Cpath d='M0 4L6 15L0 26M60 4L54 15L60 26'/%3E%3Cpath d='M12 15h-6M54 15h-6'/%3E%3Cpath d='M6 8v14M54 8v14'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 60px 30px;
+  background-repeat: repeat-x;
+}
+
+/* Верхняя лента идёт вправо, нижняя — влево: две встречные полосы
+   читаются как движение, а не как съехавшая вёрстка.
+   Класс animate ставит скрипт, поэтому при выключенных скриптах
+   ленты просто стоят на месте. */
+.animate .band--right::before { animation: band-right 5s linear infinite; }
+.animate .band--left::before { animation: band-left 5s linear infinite; }
+
+@keyframes band-right {
+  from { transform: translateX(-60px); }
+  to   { transform: translateX(0); }
+}
+@keyframes band-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-60px); }
+}
+
+/* --- 5. Кнопки и ссылки --------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;              /* палец попадает без промаха */
+  padding: 14px 26px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--white);
+  font-family: var(--font-text);
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+/* Наведение чуть приподнимает кнопку, нажатие — вжимает,
+   как настоящую клавишу. Двигается только transform. */
+.btn:hover { background: #8d1c19; transform: translateY(-2px); }
+/* Вжатие заметное: на телефоне наведения нет, а палец закрывает
+   половину кнопки — слабый отклик там просто не виден. */
+.btn:active { background: #6b1410; transform: translateY(0) scale(.94); }
+
+/* На тёмном фоне тёмно-красная кнопка сливается — выворачиваем наизнанку */
+.hero .btn--primary,
+.section--ink .btn--primary { background: var(--paper); color: var(--ink); }
+.hero .btn--primary:hover,
+.section--ink .btn--primary:hover { background: var(--white); }
+.hero .btn--primary:active,
+.section--ink .btn--primary:active { background: var(--accent-soft); color: var(--ink); }
+
+.btn--compact { min-height: 44px; padding: 10px 18px; font-size: 15px; }
+
+/* Второстепенная кнопка первого экрана: своя заливка и своя обводка.
+   Раньше это была ссылка с подчёркиванием — рядом с крупной кнопкой
+   заявки она читалась как служебная строчка, а не как действие. */
+.btn--ghost {
+  background: rgba(201, 162, 39, .16);
+  border: 1.5px solid var(--accent-soft);
+  color: var(--paper);
+}
+.btn--ghost:hover { background: rgba(201, 162, 39, .3); }
+.btn--ghost:active {
+  background: var(--accent-soft);
+  color: var(--ink);
+  border-color: var(--accent-soft);
+}
+
+.btn--outline {
+  background: transparent;
+  border: 1.5px solid var(--accent-soft);
+  color: var(--paper);
+}
+.btn--outline:hover { background: rgba(255, 255, 255, .1); }
+.btn--outline:active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-soft); }
+
+/* Подчёркивание не мигает, а выезжает сбоку: полоска растягивается
+   от левого края через transform, поэтому вёрстка не пересчитывается. */
+.link-underline {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 10px;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(1);
+  transform-origin: left center;
+  transition: transform 220ms cubic-bezier(.2, .7, .2, 1);
+}
+.link-underline:hover::after { animation: underline-sweep 380ms cubic-bezier(.2, .7, .2, 1); }
+.link-underline:active { opacity: .65; }
+
+@keyframes underline-sweep {
+  0%   { transform: scaleX(0); transform-origin: left center; }
+  100% { transform: scaleX(1); transform-origin: left center; }
+}
+
+/* --- 6. Шапка ------------------------------------------------------------- */
+
+.header {
+  position: sticky; top: 0; z-index: 40;
+  background: var(--ink);
+  color: var(--paper);
+}
+.header__inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 10px var(--gap);
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;                /* палец должен попадать по ссылке */
+  font-family: var(--font-brand);
+  font-weight: 400;
+  font-size: 17px;
+  /* Плакатный шрифт и так плотный: сжимать его нельзя, буквы слипнутся.
+     Наоборот, чуть разводим — так читается название. */
+  letter-spacing: .02em;
+  color: var(--paper);
+  text-decoration: none;
+  margin-right: auto;
+}
+.nav { display: none; }               /* на телефоне меню прячем, есть липкая кнопка */
+.nav__list { display: flex; gap: 22px; }
+.nav__list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--accent-soft);
+  font-size: 15px;
+  text-decoration: none;
+}
+.nav__list a:hover { color: var(--white); text-decoration: underline; text-underline-offset: 4px; }
+.nav__list a:active { color: var(--white); opacity: .7; }
+
+/* --- 7. Первый экран ------------------------------------------------------ */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--paper);
+  padding-block: 40px 48px;
+  padding-inline: var(--gap);
+}
+
+/* Восьмиконечная розетка — та, что прожигают на деке гуслей.
+   Статичный фон первого экрана, цвет латуни при низкой яркости. */
+.hero__pattern {
+  position: absolute;
+  inset: 0;
+  opacity: .09;
+  /* Плитка 96×96: розетка ровно в центре, четыре ромба ровно на серединах
+     сторон. Каждый краевой ромб нарисован половиной здесь и половиной
+     в соседней плитке, поэтому шва не видно, а узор выглядит одинаково
+     и слева направо, и сверху вниз. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23c9a227' stroke-width='1.3'%3E%3Cpath d='M48 28L51.1 40.6L62.1 33.9L55.4 44.9L68 48L55.4 51.1L62.1 62.1L51.1 55.4L48 68L44.9 55.4L33.9 62.1L40.6 51.1L28 48L40.6 44.9L33.9 33.9L44.9 40.6Z'/%3E%3Cpath d='M48 -5l5 5-5 5-5 -5z'/%3E%3Cpath d='M48 91l5 5-5 5-5 -5z'/%3E%3Cpath d='M0 43l5 5-5 5-5 -5z'/%3E%3Cpath d='M96 43l5 5-5 5-5 -5z'/%3E%3Ccircle cx='48' cy='48' r='5'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 96px 96px;
+}
+
+/* --- 7a. Струны гуслей — главный приём -----------------------------------
+   Каждая струна нарисована дугой, но в покое сплющена по вертикали
+   почти до прямой линии. Щипок распрямляет дугу и гасит её
+   колебания. Двигается только transform, вёрстка не пересчитывается.
+   Толщина линии не тянется за масштабом благодаря non-scaling-stroke. */
+
+/* Панель двух инструментов. На телефоне половины идут друг под другом:
+   если поделить 360 px пополам, струны превращаются в обрубки.
+   На широком экране встают рядом — так читается, что это дуэт. */
+.duet {
+  /* Слева струны, справа кнопки — два инструмента дуэта рядом.
+     Половины ровно равные: 1fr и 1fr. Раньше правая колонка была
+     шириной по содержимому, и панель выглядела перекошенной. */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: center;
+  margin-top: 26px;
+  max-width: 460px;
+}
+
+.strings {
+  /* Место под струны занято заранее: скрипт добавляет их после
+     загрузки, и без этой высоты страница дёрнулась бы вниз. */
+  position: relative;
+  height: calc(5 * var(--panel-step));
+}
+
+/* Каждая струна стоит на своей высоте: её задаёт скрипт в --y.
+   Крайние ложатся на кромку крайних рядов кнопок, средние — в просветы
+   между рядами. Полоса нажатия шире самой линии: по линии в два пикселя
+   пальцем не попасть. */
+.string {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--y) - var(--panel-step) / 2);
+  display: flex;
+  align-items: center;
+  height: var(--panel-step);       /* зона попадания курсора и пальца */
+  cursor: pointer;
+}
+.string svg {
+  width: 100%;
+  height: var(--panel-step);
+  display: block;
+  overflow: visible;
+}
+/* Щипок: струна дрожит по вертикали и вспыхивает, затем гаснет.
+   Пробовал два других пути и оба отпали: растягивание снаружи SVG
+   утолщало линию вместе с формой (струна раздувалась в белую полосу),
+   а анимация самой кривой в Chromium к отрисовке не применяется.
+   Сдвиг работает везде и вёрстку не трогает. */
+.string path {
+  fill: none;
+  /* Светлая латунь: тёмный акцент на тёмном дереве не читался вовсе */
+  stroke: #e6d3a0;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  opacity: .95;
+  transition: opacity 170ms ease, stroke 170ms ease;
+}
+.string:hover path { opacity: 1; stroke: var(--white); }
+
+/* Толстые струны гудят дольше тонких — длительность задаёт скрипт. */
+.string.is-plucked svg {
+  animation: pluck var(--ring, 900ms) cubic-bezier(.25, .6, .3, 1) both;
+}
+.string.is-plucked path { animation: pluck-glow var(--ring, 900ms) ease-out both; }
+
+/* Размах щипка укладывается в шаг между струнами — 20 px,
+   поэтому соседнюю он не задевает. */
+@keyframes pluck {
+  0%   { transform: translateY(-5px); }
+  18%  { transform: translateY(4px); }
+  36%  { transform: translateY(-2.6px); }
+  54%  { transform: translateY(1.6px); }
+  72%  { transform: translateY(-.9px); }
+  86%  { transform: translateY(.4px); }
+  100% { transform: translateY(0); }
+}
+@keyframes pluck-glow {
+  0%   { stroke: #fffaf0; opacity: 1; }
+  100% { stroke: #e6d3a0; opacity: .95; }
+}
+
+/* --- 7b. Кнопки баяна ----------------------------------------------------
+   У баяна на правой стороне не клавиши, а круглые кнопки: пять рядов,
+   каждый следующий сдвинут — поэтому ряды читаются по диагонали.
+   Кнопка отзывается иначе, чем струна: не колеблется, а утапливается. */
+
+.keys {
+  display: grid;
+  /* Просвет по вертикали добирает шаг до нужного: step минус размер
+     кнопки. По горизонтали просвет свой, там кнопки стоят теснее. */
+  row-gap: calc(var(--panel-step) - var(--panel-key));
+  column-gap: var(--panel-gap);
+  align-content: center;
+  width: 100%;                    /* клавиатура занимает свою половину целиком */
+  height: calc(5 * var(--panel-step));
+  /* Крайние ряды сдвинуты в стороны на 6 px; берём 7 — на пиксель
+     больше, чтобы обводка крайней кнопки не цеплялась за край. */
+  padding-inline: 7px;
+}
+
+/* Ряд — сетка из равных колонок, поэтому кнопки растягиваются
+   на всю ширину половины, сколько бы их ни было.
+   Сдвиг ряда задаёт скрипт через transform: средний ряд стоит на месте,
+   верхний и нижний уходят в разные стороны на одинаковую величину.
+   Так остаётся и косина настоящей клавиатуры, и симметрия блока. */
+/* Высота ряда задана явно, а не выведена из размера кнопки: кнопка
+   тянется по ширине колонки и на узком экране выходит чуть меньше.
+   Без этого шаг рядов уплывал и переставал совпадать со струнами. */
+/* Ряд — сетка из равных колонок. Сдвиг ряда задаёт скрипт через
+   transform: верхние ряды уходят влево, нижние вправо на одинаковую
+   величину, поэтому косина есть, а блок остаётся симметричным. */
+.keys__row {
+  display: grid;
+  grid-template-columns: repeat(var(--per, 8), 1fr);
+  align-items: center;
+  column-gap: var(--panel-gap);
+  height: var(--panel-key);
+}
+
+/* Размер кнопки задан в пикселях, а не долей от ширины колонки:
+   иначе он менялся бы с шириной экрана, а вместе с ним уплывал бы шаг
+   рядов — и крайние струны переставали бы ложиться на кромку. */
+.keys__btn {
+  width: var(--panel-key);
+  height: var(--panel-key);
+  justify-self: center;
+  padding: 0;
+  /* Кнопки баяна перламутровые: светлые и плотные. */
+  border: 1px solid rgba(42, 30, 20, .55);
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: inset 0 -1px 0 rgba(42, 30, 20, .18);
+  cursor: pointer;
+  transition: background-color 160ms ease, transform 160ms ease, border-color 160ms ease;
+}
+/* На баяне светлые и тёмные кнопки идут столбцами вдоль грифа —
+   по этим полосам и находят нужный ряд, не глядя на клавиатуру. */
+.keys__btn--dark {
+  background: #1e1a16;
+  border-color: rgba(244, 233, 213, .35);
+  box-shadow: inset 0 -1px 0 rgba(244, 233, 213, .12);
+}
+
+.keys__btn:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+}
+/* Нажатая кнопка уходит вглубь корпуса */
+.keys__btn:active,
+.keys__btn.is-pressed {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(.78);
+}
+
+.hero__inner { position: relative; max-width: var(--wrap); margin: 0 auto; }
+
+.hero__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(32px, 9vw, 70px);
+  line-height: 1.04;
+  letter-spacing: -.02em;
+  margin-bottom: 20px;
+}
+/* Заголовок выезжает построчно из-под невидимой шторки.
+   Строки размечает скрипт — по тому, где браузер сам перенёс текст.
+   Пока скрипт не отработал, строки видны: если что-то пойдёт не так,
+   заголовок останется на месте, а не пропадёт. */
+.hero__title .line {
+  display: block;
+  overflow: hidden;
+  /* запас под нижние выносы букв, чтобы шторка их не срезала */
+  padding-bottom: .08em;
+  margin-bottom: -.08em;
+}
+.hero__title .line__in { display: block; }
+
+.animate .hero__title .line__in {
+  transition: transform 420ms cubic-bezier(.2, .7, .2, 1);
+}
+.animate .hero__title:not(.is-in) .line__in { transform: translateY(105%); }
+
+.hero__subtitle {
+  max-width: 46ch;
+  font-size: 17px;
+  color: var(--accent-soft);
+  margin-bottom: 28px;
+}
+.hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 22px; }
+.hero__actions .btn { flex: 1 1 auto; min-width: 160px; }
+
+.hero__figure { margin: 36px 0 0; }
+/* Маска-арка: та же форма, что у наличника. Второй этнический элемент. */
+.hero__photo {
+  width: 100%;
+  border-radius: 50% 50% var(--radius) var(--radius) / 26% 26% var(--radius) var(--radius);
+  object-fit: cover;
+  aspect-ratio: 4 / 3;
+}
+
+/* --- 8. Форматы ----------------------------------------------------------- */
+
+/* На телефоне форматы — лента, которую листают вбок: шесть пунктов
+   подряд вниз читать утомительно. Соседняя карточка нарочно выглядывает
+   из-за края, чтобы было видно, что список продолжается.
+   С планшета и шире возвращается обычный список. */
+.formats {
+  /* Сколько соседней карточки видно по краям. Одно число задаёт
+     и ширину карточки, и отступы ленты — поэтому выступ слева
+     и справа всегда одинаковый. */
+  --peek: 18px;
+
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  padding-bottom: 10px;
+  /* лента начинается от самого края экрана */
+  margin-inline: calc(var(--gap) * -1);
+  /* Отступ по краям равен выступу плюс промежуток между карточками.
+     Ровно столько нужно, чтобы первая и последняя карточка встали
+     по центру экрана, как и все остальные. */
+  padding-inline: calc(var(--peek) + 12px);
+}
+
+.format {
+  /* 100% считается от внутренней ширины ленты, а она уже уменьшена
+     отступами выше. Из-за края выглядывает только корешок соседней
+     карточки — рамка и полоска фона, без текста: обрезанные слова
+     читаются как поломка. */
+  flex: 0 0 100%;
+  /* Карточка встаёт по центру экрана, а не прижимается к левому краю:
+     иначе слева выступ 0, а справа 18 px — и лента выглядит съехавшей. */
+  scroll-snap-align: center;
+  /* Останавливаемся на каждой карточке. По умолчанию быстрый смах
+     пролетает точки остановки насквозь и лента улетает сразу до конца:
+     замерено — один резкий смах уносил на пять карточек. С always
+     браузер обязан затормозить на ближайшей. */
+  scroll-snap-stop: always;
+  padding: 20px;
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--radius);
+  background: var(--white);
+}
+
+/* Точки под лентой: показывают, сколько всего форматов и какой открыт.
+   По ним же можно переключаться нажатием. */
+.formats__dots {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+.formats__dot {
+  /* точка маленькая, но нажимаемая область — полноценные 44 px */
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.formats__dot::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  transition: background-color 170ms ease, transform 170ms ease;
+}
+.formats__dot[aria-current="true"]::before {
+  background: var(--accent);
+  transform: scale(1.35);
+}
+/* Отклик на само нажатие: точка на миг становится крупнее и темнее */
+.formats__dot:active::before {
+  background: var(--accent);
+  transform: scale(1.6);
+}
+
+.format__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+}
+.format__name {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 21px;
+  font-weight: 400;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.format__price {
+  font-weight: 600;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.format__what { margin: 8px 0 12px; }
+
+.format__meta { display: grid; gap: 6px; margin: 0; }
+.format__meta dt {
+  font-size: 13px;
+  color: var(--muted);
+}
+.format__meta dd { margin: 0 0 6px; font-size: 15px; }
+
+/* --- 9. Репертуар --------------------------------------------------------- */
+
+.repertoire { display: grid; gap: 32px; margin-top: 28px; }
+
+.rep__name {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 400;
+  margin: 0 0 10px;
+  padding-top: 16px;
+  border-top: 4px solid var(--accent);
+  display: inline-block;
+}
+.rep__text { margin-bottom: 10px; }
+.rep__examples { font-size: 15px; color: var(--muted); margin: 0; }
+.rep__examples b { font-weight: 600; color: var(--ink); }
+
+/* Прослушивание сэмпла. Полоса прогресса тянется через scaleX,
+   а не через width — ширина заставила бы браузер пересчитывать вёрстку. */
+.sample { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
+
+.sample__btn {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 1.5px solid var(--accent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--accent);
+  font-family: var(--font-text);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 170ms ease, color 170ms ease, border-color 170ms ease, transform 170ms ease;
+}
+.sample__btn:hover { background: var(--accent); color: var(--white); }
+.sample__btn:active { background: #6b1410; color: var(--white); border-color: #6b1410; transform: scale(.94); }
+.sample__btn[disabled] {
+  border-color: var(--accent-soft);
+  color: var(--muted);
+  cursor: default;
+}
+.sample__btn[disabled]:hover { background: transparent; color: var(--muted); }
+.sample__btn[aria-pressed="true"] { background: var(--accent); color: var(--white); }
+
+.sample__track {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent-soft);
+  overflow: hidden;
+}
+.sample__bar {
+  height: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 260ms linear;
+}
+.sample__note { font-size: 14px; color: var(--muted); margin: 0; }
+
+/* --- 10. Видео, аудио, фото ----------------------------------------------- */
+
+.video { margin-top: 24px; }
+.video-row { display: grid; gap: 16px; margin-top: 16px; }
+
+.video__btn {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: var(--ink);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  aspect-ratio: 16 / 9;
+}
+.video__poster { width: 100%; height: 100%; object-fit: cover; opacity: .82; transition: opacity 160ms ease; }
+.video__btn:hover .video__poster { opacity: 1; }
+
+.video__play {
+  position: absolute;
+  left: 50%; top: 50%;
+  translate: -50% -50%;             /* отдельно от transform, чтобы hover им не мешал */
+  width: 64px; height: 64px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--accent);
+  transition: transform 180ms ease;
+}
+.video__btn:hover .video__play { transform: scale(1.05); }
+.video__btn:active .video__play { transform: scale(.96); }
+.video__btn:active .video__poster { opacity: 1; }
+.video__play svg { width: 22px; height: 22px; margin-left: 3px; }
+
+.video__caption { margin: 8px 0 0; font-size: 14px; color: var(--muted); }
+
+.video iframe, .audio iframe {
+  width: 100%;
+  border: 0;
+  border-radius: var(--radius);
+  display: block;
+}
+.video iframe { aspect-ratio: 16 / 9; height: auto; }
+
+.audio { margin-top: 12px; }
+.audio__note, .media__empty {
+  padding: 16px;
+  border: 1.5px dashed var(--accent-soft);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: 15px;
+  margin: 0;
+}
+/* На тёмном фоне серый текст не читается */
+.section--ink .media__empty { color: var(--accent-soft); }
+
+/* Лента фотографий: на телефоне листается вбок */
+.photos {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  padding-bottom: 8px;
+}
+/* Ленте фотографий нужна та же остановка: без неё смах пролистывает
+   половину галереи разом. */
+.photos li { flex: 0 0 76%; scroll-snap-align: start; scroll-snap-stop: always; }
+.photos img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+/* --- 11. Отзывы ----------------------------------------------------------- */
+
+.reviews { display: grid; gap: 28px; margin-top: 28px; }
+
+.review {
+  margin: 0;                       /* у blockquote есть свой отступ, он тут лишний */
+  border-left: 3px solid var(--accent);
+  padding-left: 18px;
+}
+.review__text { margin-bottom: 10px; }
+.review__author { margin: 0; font-weight: 600; }
+.review__role { margin: 0; font-size: 14px; color: var(--muted); }
+
+/* --- 12. О дуэте ---------------------------------------------------------- */
+
+/* Свет в зале гаснет: к концу страницы фон уходит из светлого в тёмный
+   и без стыка переходит в блок контактов. Это не анимация, а обычный
+   градиент — он ничего не стоит и работает даже при выключенном движении.
+   Нижний отступ нужен, чтобы тёмная часть пришлась на пустое место,
+   а не на текст. */
+#about {
+  padding-bottom: 220px;
+  /* Затемнение отмеряем от низа блока, а не в процентах: так оно всегда
+     приходится на пустой отступ и не ложится на текст и фотографию,
+     какой бы длины ни оказался текст. */
+  background: linear-gradient(to bottom, var(--paper) calc(100% - 220px), var(--ink) 100%);
+}
+
+.about { display: grid; gap: 28px; }
+.about__lead { font-size: 19px; }
+
+.credentials { margin: 24px 0 0; }
+.credentials dt { font-size: 13px; color: var(--muted); }
+.credentials dd { margin: 2px 0 14px; }
+
+.about__photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+/* --- 13. Контакты и форма ------------------------------------------------- */
+
+.contacts__buttons { display: grid; gap: 12px; margin: 28px 0 8px; }
+.contacts__buttons .btn { width: 100%; }
+
+.form-block { margin-top: 40px; }
+.form { display: grid; gap: 4px; max-width: 520px; }
+.form__row { display: grid; gap: 6px; margin: 0 0 16px; }
+.form__label { font-size: 15px; font-weight: 600; }
+.form__hint { font-size: 13px; color: var(--accent-soft); }
+
+/* Переключатель способа связи. Выбор меняет клавиатуру на телефоне. */
+/* Строка формы держит отступ 6 px — этого хватает между лёгкой
+   подписью и полем. Но здесь друг под другом стоят две плотные
+   фигуры: залитая таблетка и поле ввода, и на таком отступе они
+   читаются как склеенные. Добавляем воздуха только этому блоку,
+   не трогая остальные строки формы. */
+.modes {
+  display: flex;
+  gap: 8px;
+  margin-block: 2px 6px;
+}
+.modes__btn {
+  min-height: 44px;
+  padding: 8px 18px;
+  border: 1.5px solid var(--accent-soft);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--paper);
+  font-family: var(--font-text);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+.modes__btn:hover { background: rgba(253, 248, 238, .12); }
+.modes__btn:active { transform: scale(.94); }
+.modes__btn[aria-checked="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  color: var(--ink);
+}
+
+.form__input {
+  min-height: 52px;
+  padding: 12px 14px;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: 16px;                 /* меньше 16px — iOS зумит страницу */
+  width: 100%;
+}
+.form__input:hover { border-color: var(--accent-soft); }
+.form__input[aria-invalid="true"] { border-color: #b03030; }
+
+.form__error { margin: 0; font-size: 14px; color: #ffb4b4; }
+.form__submit { margin-top: 8px; width: 100%; }
+.form__status { margin: 12px 0 0; min-height: 1.6em; font-size: 15px; }
+
+/* Ответ формы появляется с коротким движением — человек смотрит именно
+   сюда, когда нажал кнопку. */
+.animate .form__status.is-answer {
+  animation: answer 320ms cubic-bezier(.2, .7, .2, 1) both;
+}
+@keyframes answer {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.social { margin-top: 44px; }
+.social__list { display: flex; flex-wrap: wrap; gap: 10px 20px; }
+.social__list a { color: var(--accent-soft); }
+
+/* --- 13а. Опросник --------------------------------------------------------
+   Все ответы — таблетки, как переключатель в форме: по ним удобно
+   попадать пальцем и сразу видно, что выбрано. Вопросов много,
+   поэтому между группами воздуха больше, чем внутри группы. */
+
+.brief { display: grid; gap: 26px; margin-top: 30px; }
+
+.brief__label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.chip {
+  min-height: 44px;                /* палец попадает без промаха */
+  padding: 9px 16px;
+  border: 1.5px solid var(--accent-soft);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--paper);
+  font-family: var(--font-text);
+  font-size: 15px;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, transform 130ms ease;
+}
+.chip:hover { background: rgba(253, 248, 238, .12); }
+.chip:active { transform: scale(.94); }
+/* Выбранное горит латунью — тем же цветом, что струны и узор */
+.chip[aria-checked="true"],
+.chip[aria-pressed="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.brief__date { margin-top: 30px; max-width: 520px; }
+
+.brief__result {
+  margin: 30px 0 40px;
+  padding: 20px;
+  border: 1.5px solid var(--accent-soft);
+  border-radius: var(--radius);
+}
+.brief__resultTitle {
+  margin: 0 0 6px;
+  font-family: var(--font-text);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--accent-soft);
+}
+.brief__sum {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+  font-size: clamp(24px, 7vw, 34px);
+  line-height: 1.15;
+  color: var(--white);
+  font-variant-numeric: tabular-nums;
+}
+.brief__fine { margin: 0 0 14px; font-size: 14px; color: var(--accent-soft); }
+
+.brief__text {
+  width: 100%;
+  padding: 14px;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: 16px;                 /* меньше 16px — iOS зумит страницу */
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.brief__actions { display: grid; gap: 10px; margin-top: 12px; }
+.brief__actions .btn { width: 100%; }
+
+@media (min-width: 700px) {
+  .brief__actions { grid-template-columns: repeat(3, 1fr); }
+  .brief__actions .btn { width: auto; }
+}
+
+/* --- 13б. Врезка опросника на главной ------------------------------------- */
+
+.teaser { max-width: 46ch; }
+.teaser__text { color: var(--accent-soft); margin-bottom: 10px; }
+.teaser__note { font-size: 14px; color: var(--muted); margin-bottom: 22px; }
+/* На тёмном фоне обычный приглушённый цвет не читается */
+.section--ink .teaser__note { color: #9b8a72; }
+.teaser__btn { width: 100%; }
+
+@media (min-width: 700px) {
+  .teaser__btn { width: auto; }
+}
+
+/* --- 13в. Страница опросника ---------------------------------------------
+   Отдельная страница, поэтому у неё свой фон и свой низ: кнопки шага
+   всегда под рукой, а не в конце длинного списка. */
+
+.page--brief { background: var(--ink); color: var(--paper); }
+.page--brief .header { position: static; }
+.header__back { color: var(--accent-soft); font-size: 15px; }
+
+.briefPage { padding-block: 24px 140px; }   /* снизу место под панель шага */
+
+.progress { margin-bottom: 26px; }
+.progress__count {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--accent-soft);
+  font-variant-numeric: tabular-nums;
+}
+.progress__track {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(201, 162, 39, .28);
+  overflow: hidden;
+}
+/* Тянем через scaleX, а не ширину: ширина заставила бы браузер
+   пересчитывать вёрстку на каждом шаге. */
+.progress__bar {
+  height: 100%;
+  background: var(--accent-soft);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 320ms cubic-bezier(.2, .7, .2, 1);
+}
+
+.briefPage__notice {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--accent-soft);
+  border-radius: var(--radius);
+  font-size: 15px;
+  color: var(--accent-soft);
+}
+.briefPage__notice:empty { display: none; }
+
+/* Поле у ответов вроде «Другое»: открывается под таблетками,
+   когда такой ответ выбран */
+.ask { display: grid; gap: 6px; margin: 16px 0 0; max-width: 520px; }
+.ask__label { font-size: 15px; font-weight: 600; }
+
+.step:focus { outline: none; }        /* фокус ставим программно, рамка не нужна */
+.step__question {
+  font-size: clamp(24px, 6.5vw, 34px);
+  margin-bottom: 6px;
+}
+.step__hint { font-size: 14px; color: var(--accent-soft); margin-bottom: 16px; }
+.step__date { margin-top: 28px; max-width: 520px; }
+
+/* Нижняя панель: слева бегущая вилка, справа шаги */
+.stepbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 50;
+  background: var(--white);
+  border-top: 1px solid var(--accent-soft);
+  padding: 10px var(--gap) calc(10px + env(safe-area-inset-bottom));
+  transition: transform 220ms cubic-bezier(.2, .7, .2, 1);
+}
+/* Пока человек печатает, панель уезжает вниз: иначе она накрывает
+   поле ввода вместе с выехавшей клавиатурой. */
+.stepbar.is-away { transform: translateY(120%); pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .stepbar { transition: none; }
+}
+.stepbar__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  max-width: var(--wrap);
+  margin: 0 auto;
+}
+.stepbar__sum {
+  flex: 1 1 100%;
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 20px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.stepbar__buttons { display: flex; gap: 10px; flex: 1 1 100%; }
+.stepbar__buttons .btn { flex: 1 1 auto; }
+.stepbar .btn--outline { color: var(--accent); border-color: var(--accent); }
+.stepbar .btn--outline:hover { background: rgba(168, 35, 31, .1); }
+.stepbar .btn--outline:active { background: var(--accent); color: var(--white); }
+
+@media (min-width: 700px) {
+  .stepbar__sum { flex: 1 1 auto; font-size: 22px; }
+  .stepbar__buttons { flex: 0 0 auto; }
+  .stepbar__buttons .btn { flex: 0 0 auto; }
+}
+
+/* --- 14. Подвал ----------------------------------------------------------- */
+
+.footer {
+  background: var(--ink);
+  color: var(--accent-soft);
+  padding-block: 32px;
+  font-size: 15px;
+}
+.footer__inner p { margin: 0 0 6px; }
+.footer__brand { font-family: var(--font-brand); font-weight: 400; color: var(--paper); }
+.footer__copy { font-variant-numeric: tabular-nums; }
+
+/* --- 15. Липкая кнопка связи ---------------------------------------------- */
+
+/* Панель уезжает вниз, когда мешает: при вводе в форму и на блоке
+   контактов. Не display:none — так возвращается она плавно. */
+.sticky.is-away { transform: translateY(120%); pointer-events: none; }
+
+.sticky {
+  transition: transform 220ms cubic-bezier(.2, .7, .2, 1);
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 50;
+  background: var(--white);
+  border-top: 1px solid var(--accent-soft);
+  padding: 10px var(--gap) calc(10px + env(safe-area-inset-bottom));
+}
+.sticky__inner { display: flex; gap: 10px; max-width: var(--wrap); margin: 0 auto; }
+.sticky .btn { flex: 1 1 auto; }
+.sticky .btn--icon {
+  flex: 0 0 auto;
+  width: 52px;
+  padding: 0;
+  background: var(--paper);
+  color: var(--accent);
+  border: 1.5px solid var(--accent-soft);
+}
+.sticky .btn--icon:hover { background: var(--accent-soft); }
+.sticky .btn--icon:active { background: var(--accent); color: var(--white); border-color: var(--accent); }
+.sticky .btn--icon svg { width: 22px; height: 22px; }
+
+/* Пока панель видна, добавляем воздух внизу страницы,
+   чтобы она не накрывала последний блок и фокус на нём. */
+body.has-sticky { padding-bottom: 84px; }
+
+/* --- 15a. Появление трёх секций при скролле -------------------------------
+   Класс .ready ставится скриптом после загрузки разметки. Без скриптов
+   ничего не прячется — страница просто показывается целиком. */
+
+.animate .reveal {
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+  transition: opacity 360ms ease, transform 360ms ease;
+}
+.animate .reveal.is-visible { opacity: 1; transform: none; }
+
+/* В репертуаре появляется не вся секция, а три блока подряд,
+   с задержкой в 50 мс между ними. */
+.animate .reveal--stagger { opacity: 1; transform: none; }
+.animate .reveal--stagger .rep {
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+  transition: opacity 340ms ease, transform 340ms ease;
+}
+.animate .reveal--stagger.is-visible .rep { opacity: 1; transform: none; }
+.animate .reveal--stagger.is-visible .rep:nth-child(2) { transition-delay: 50ms; }
+.animate .reveal--stagger.is-visible .rep:nth-child(3) { transition-delay: 100ms; }
+
+/* --- 16. Уважение к настройке «меньше движения» ---------------------------
+   Гасим движение, но оставляем смену состояний у кнопок и полей:
+   без неё интерфейс перестаёт отвечать на действия. */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  .string.is-plucked svg,
+  .string.is-plucked path { animation: none; }
+
+  .animate .band--right::before,
+  .animate .band--left::before { animation: none; }
+
+  .animate .reveal,
+  .animate .reveal.is-visible,
+  .animate .reveal--stagger .rep,
+  .animate .reveal--stagger.is-visible .rep {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .sample__bar { transition: none; }
+  .sticky { transition: none; }
+  .btn:hover, .btn:active { transform: none; }
+  .link-underline:hover::after { animation: none; }
+  .video__btn:hover .video__play { transform: none; }
+  .skip-link { transition: none; }
+
+  .animate .hero__title .line__in,
+  .animate .hero__title:not(.is-in) .line__in { transform: none; transition: none; }
+  .animate .form__status.is-answer { animation: none; }
+}
+
+/* --- 17. Планшет ---------------------------------------------------------- */
+
+@media (min-width: 700px) {
+  .section { padding-block: 72px; }
+  .hero { padding-block: 64px 72px; }
+
+  .hero__actions .btn { flex: 0 0 auto; }
+  .hero__photo { aspect-ratio: 16 / 9; }
+
+  .video-row { grid-template-columns: 1fr 1fr; }
+  .photos { display: grid; grid-template-columns: repeat(3, 1fr); overflow: visible; }
+  .photos li { flex: none; }
+
+  .repertoire { grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .reviews { grid-template-columns: repeat(3, 1fr); }
+  .contacts__buttons { grid-template-columns: repeat(2, 1fr); }
+  .contacts__buttons .btn { width: auto; }
+
+  /* Места хватает — лента снова становится списком */
+  .formats {
+    display: block;
+    overflow: visible;
+    margin-inline: 0;
+    padding-inline: 0;
+    padding-bottom: 0;
+  }
+  .format {
+    padding: 22px 0;
+    border: 0;
+    border-top: 1px solid var(--accent-soft);
+    border-radius: 0;
+    background: none;
+  }
+  .format:last-child { border-bottom: 1px solid var(--accent-soft); }
+  .formats__dots { display: none; }
+
+  .format__head { flex-wrap: nowrap; }
+  .format__meta { grid-template-columns: repeat(3, 1fr); gap: 6px 24px; }
+
+  .about { grid-template-columns: 1.2fr 1fr; align-items: start; gap: 40px; }
+  .credentials { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 20px; }
+}
+
+/* --- 18. Десктоп ---------------------------------------------------------- */
+
+@media (min-width: 1000px) {
+  body { font-size: 17px; }
+
+  .nav { display: block; }
+  .header__inner { padding-block: 14px; }
+  .brand { font-size: 17px; }
+
+  .hero { padding-block: 56px 72px; }
+  .hero__inner { display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; align-items: center; }
+
+  /* Места хватает — половины шире, но по-прежнему равные.
+     Высоту струнам здесь не задаём: она должна остаться той же,
+     что у клавиатуры, иначе половины разъедутся по вертикали. */
+  .duet { grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; margin-top: 28px; }
+  .hero__figure { margin: 0; }
+  .hero__photo { aspect-ratio: 3 / 4; }
+
+  /* Липкая панель нужна только там, где нет шапки под рукой */
+  .sticky { display: none; }
+  body.has-sticky { padding-bottom: 0; }
+
+  .form { max-width: 560px; }
+}

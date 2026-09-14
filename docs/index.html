@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<!-- interactive-widget=resizes-content: когда открывается экранная
+     клавиатура, страница ужимается под неё, а не остаётся во весь экран.
+     Без этого поля ввода прячутся за клавиатурой. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+<meta name="theme-color" content="#191512">
+
+<!-- ===========================================================================
+     ТЕГИ ДЛЯ ПОИСКОВИКОВ И МЕССЕНДЖЕРОВ.
+     Это единственное место вне content.js, где лежит текст.
+     Причина: когда ссылку кидают в Telegram или WhatsApp, их роботы
+     не запускают скрипты и читают только эти строки.
+     Если правите тексты в content.js (раздел 10) — продублируйте их здесь.
+     =========================================================================== -->
+<title>Заказать музыкантов на праздник в Москве: дуэт баяна и гуслей — In stile russo</title>
+<meta name="description" content="Дуэт народных инструментов «In stile russo»: баян и гусли на свадьбу, корпоратив, юбилей и городской праздник в Москве. Народная классика и современные хиты в народной обработке. Видео, форматы, стоимость.">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="In stile russo">
+<meta property="og:title" content="Дуэт баяна и гуслей на праздник в Москве — In stile russo">
+<meta property="og:description" content="Народная классика и современные хиты в народной обработке. Свадьбы, корпоративы, городские праздники.">
+<meta property="og:image" content="img/og.webp">
+<meta property="og:image:alt" content="Дуэт «In stile russo»: баян и гусли">
+<meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
+
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://nmoskalev10.github.io/praktika">
+
+<link rel="icon" href="favicon/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="favicon/apple-touch-icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600&family=Monomakh&family=Oranienbaum&family=Ruslan+Display&display=swap">
+<link rel="stylesheet" href="style.css">
+
+<!-- Тексты и логика. defer: браузер сначала разбирает всю разметку,
+     затем сразу выполняет оба файла — до первой отрисовки, поэтому
+     страница не успевает мелькнуть пустой. -->
+<script src="content.js" defer></script>
+<script src="script.js" defer></script>
+
+<!-- Страховка: без скриптов или при ошибке в них страница всё равно
+     показывается, просто без подставленных текстов. -->
+<noscript><style>body { visibility: visible !important; }</style></noscript>
+<script>setTimeout(function () { document.documentElement.classList.add('ready'); }, 2000);</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MusicGroup",
+  "name": "In stile russo",
+  "alternateName": "Дуэт народных инструментов «In stile russo»",
+  "genre": ["Русская народная музыка", "Фолк-кроссовер"],
+  "description": "Дуэт баяна и гуслей: народная классика и современные хиты в народной обработке. Выступления на свадьбах, корпоративах, юбилеях и городских праздниках.",
+  "url": "https://nmoskalev10.github.io/praktika",
+  "image": "https://nmoskalev10.github.io/praktika/img/og.webp",
+  "areaServed": { "@type": "City", "name": "Москва" },
+  "location": { "@type": "Place", "address": { "@type": "PostalAddress", "addressLocality": "Москва", "addressCountry": "RU" } },
+  "member": [
+    { "@type": "Person", "name": "Пётр Демидов" },
+    { "@type": "Person", "name": "Анна Светлова" }
+  ],
+  "telephone": "+79000000000",
+  "email": "privet@example.com",
+  "sameAs": ["https://example.com/instilerusso", "https://example.com/instilerusso_channel", "https://example.com/@instilerusso"]
+}
+</script>
+</head>
+
+<body>
+
+<a class="skip-link" href="#main" data-text="ui.skipLink"></a>
+
+<header class="header" id="header">
+  <div class="header__inner">
+    <a class="brand" href="#top" data-text="brand.name" translate="no"></a>
+    <nav class="nav" aria-label="" data-attr-aria-label="ui.navLabel">
+      <ul class="nav__list" id="nav-list"></ul>
+    </nav>
+    <a class="btn btn--compact header__cta" href="#contacts" data-text="cta"></a>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ПЕРВЫЙ ЭКРАН -->
+  <section class="hero" id="top">
+    <div class="hero__pattern" aria-hidden="true"></div>
+    <div class="hero__inner">
+      <div class="hero__text">
+        <h1 class="hero__title" data-text="hero.title"></h1>
+        <p class="hero__subtitle" data-text="hero.subtitle"></p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="#contacts" data-text="cta"></a>
+          <a class="btn btn--ghost hero__video-link" href="#media" data-text="hero.secondaryLink"></a>
+        </div>
+        <!-- Два инструмента дуэта. Слева струны гуслей: в покое дуга
+             сплющена в прямую линию, при щипке распрямляется и затухает.
+             Справа правая клавиатура баяна — круглые кнопки косыми рядами,
+             они утапливаются при нажатии. Всё на transform. -->
+        <div class="duet" aria-hidden="true">
+          <div class="strings" id="strings"></div>
+          <div class="keys" id="keys"></div>
+        </div>
+      </div>
+      <figure class="hero__figure">
+        <img class="hero__photo" id="hero-photo" alt="" decoding="async" fetchpriority="high">
+      </figure>
+    </div>
+  </section>
+
+  <div class="band band--right" aria-hidden="true"></div>
+
+  <!-- ФОРМАТЫ -->
+  <section class="section" id="formats">
+    <div class="wrap">
+      <h2 class="section__title" data-text="formats.title"></h2>
+      <p class="section__intro" data-text="formats.intro"></p>
+      <!-- tabindex нужен, чтобы ленту можно было листать с клавиатуры -->
+      <ul class="formats" id="formats-list" tabindex="0" aria-label="" data-attr-aria-label="ui.formatsLabel"></ul>
+      <p class="visually-hidden" data-text="ui.formatsScrollHint"></p>
+      <div class="formats__dots" id="formats-dots"></div>
+      <p class="section__note" data-text="formats.note"></p>
+    </div>
+  </section>
+
+  <!-- РЕПЕРТУАР -->
+  <section class="section section--paper reveal reveal--stagger" id="repertoire">
+    <div class="wrap">
+      <h2 class="section__title" data-text="repertoire.title"></h2>
+      <p class="section__intro" data-text="repertoire.intro"></p>
+      <div class="repertoire" id="repertoire-list"></div>
+      <p class="section__note" data-text="repertoire.note"></p>
+    </div>
+  </section>
+
+  <!-- ВИДЕО, АУДИО, ФОТО -->
+  <section class="section reveal" id="media">
+    <div class="wrap">
+      <h2 class="section__title" data-text="media.title"></h2>
+      <p class="section__intro" data-text="media.videoNote"></p>
+      <div class="video video--main" id="video-main"></div>
+      <div class="video-row" id="video-row"></div>
+
+      <h3 class="subtitle" data-text="media.audio.title"></h3>
+      <div class="audio" id="audio"></div>
+
+      <h3 class="subtitle" data-text="media.photosTitle"></h3>
+      <p class="visually-hidden" data-text="ui.photosScrollHint"></p>
+      <ul class="photos" id="photos"></ul>
+    </div>
+  </section>
+
+  <!-- ОТЗЫВЫ -->
+  <section class="section section--paper reveal" id="reviews">
+    <div class="wrap">
+      <h2 class="section__title" data-text="reviews.title"></h2>
+      <div class="reviews" id="reviews-list"></div>
+    </div>
+  </section>
+
+  <!-- О ДУЭТЕ -->
+  <section class="section" id="about">
+    <div class="wrap about">
+      <div class="about__text">
+        <h2 class="section__title" data-text="about.title"></h2>
+        <p class="about__lead" data-text="about.lead"></p>
+        <p data-text="about.sound"></p>
+        <dl class="credentials" id="credentials"></dl>
+      </div>
+      <figure class="about__figure">
+        <img class="about__photo" id="about-photo" alt="" loading="lazy" decoding="async">
+      </figure>
+    </div>
+  </section>
+
+  <div class="band band--left" aria-hidden="true"></div>
+
+  <!-- ВРЕЗКА ОПРОСНИКА.
+       Сам опросник живёт на отдельной странице brief.html: семьдесят
+       с лишним кнопок на главной превращались в стену, которую надо
+       пролистывать до контактов. Здесь только приглашение. -->
+  <section class="section section--ink" id="brief">
+    <div class="wrap">
+      <div class="teaser">
+        <h2 class="section__title" data-text="brief.teaser.title"></h2>
+        <p class="teaser__text" data-text="brief.teaser.text"></p>
+        <p class="teaser__note" id="teaser-note"></p>
+        <a class="btn btn--primary teaser__btn" href="brief.html" data-text="brief.teaser.button"></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- КОНТАКТЫ -->
+  <section class="section section--ink" id="contacts">
+    <div class="wrap">
+      <h2 class="section__title" data-text="contacts.title"></h2>
+      <p class="section__intro" data-text="contacts.lead"></p>
+
+      <div class="contacts__buttons" id="contact-buttons"></div>
+
+      <div class="form-block">
+        <h3 class="subtitle" data-text="contacts.form.title"></h3>
+        <form class="form" id="lead-form" novalidate>
+          <p class="form__row">
+            <label class="form__label" for="f-name" data-text="contacts.form.fields.name.label"></label>
+            <input class="form__input" id="f-name" name="name" type="text" autocomplete="name" required>
+          </p>
+          <p class="form__row">
+            <label class="form__label" for="f-date" data-text="contacts.form.fields.date.label"></label>
+            <input class="form__input" id="f-date" name="date" type="date" required>
+            <span class="form__hint" data-text="contacts.form.fields.date.hint"></span>
+          </p>
+          <p class="form__row">
+            <label class="form__label" for="f-type" data-text="contacts.form.fields.type.label"></label>
+            <select class="form__input" id="f-type" name="event_type"></select>
+          </p>
+          <p class="form__row">
+            <label class="form__label" id="f-contact-label" for="f-contact" data-text="contacts.form.fields.contact.label"></label>
+            <!-- Переключатель заполняет скрипт. От выбора зависит, какая
+                 клавиатура откроется: цифровая для номера, обычная для ника. -->
+            <span class="modes" id="contact-modes" role="radiogroup" aria-labelledby="f-contact-label"></span>
+            <input class="form__input" id="f-contact" name="contact" type="text" autocomplete="tel" inputmode="tel" spellcheck="false" required>
+          </p>
+          <button class="btn btn--primary form__submit" type="submit" id="form-submit" data-text="contacts.form.submit"></button>
+          <p class="form__status" id="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+
+      <div class="social">
+        <h3 class="subtitle" data-text="contacts.socialTitle"></h3>
+        <ul class="social__list" id="social-list"></ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap footer__inner">
+    <p class="footer__brand" data-text="brand.name" translate="no"></p>
+    <p data-text="footer.city"></p>
+    <p class="footer__copy" id="footer-copy"></p>
+  </div>
+</footer>
+
+<div class="sticky" id="sticky" hidden>
+  <nav class="sticky__inner" aria-label="" data-attr-aria-label="ui.stickyLabel" id="sticky-inner"></nav>
+</div>
+
+
+<!-- ===========================================================================
+     ЯНДЕКС.МЕТРИКА.
+     Чтобы включить: впишите номер счётчика в content.js (раздел 11),
+     затем снимите обрамление комментария вокруг блока ниже.
+     Как именно — в README.md, раздел 7.
+     =========================================================================== -->
+<!--
+<script>
+   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+   m[i].l=1*new Date();
+   for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+   ym(CONTENT.metrika.counterId, "init", { clickmap:true, trackLinks:true, accurateTrackBounce:true });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/НОМЕР_СЧЁТЧИКА" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+-->
+
+</body>
+</html>
