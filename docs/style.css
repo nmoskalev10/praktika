@@ -592,7 +592,10 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   overscroll-behavior-x: contain;
-  padding-bottom: 10px;
+  /* Системную полосу прокрутки прячем: под лентой и так стоят точки,
+     они показывают и сколько всего карточек, и какая открыта.
+     Прокрутке пальцем это не мешает. */
+  scrollbar-width: none;
   /* лента начинается от самого края экрана */
   margin-inline: calc(var(--gap) * -1);
   /* Отступ по краям равен выступу плюс промежуток между карточками.
@@ -600,6 +603,9 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
      по центру экрана, как и все остальные. */
   padding-inline: calc(var(--peek) + 12px);
 }
+
+.formats::-webkit-scrollbar,
+.photos::-webkit-scrollbar { width: 0; height: 0; }
 
 .format {
   /* 100% считается от внутренней ширины ленты, а она уже уменьшена
@@ -814,7 +820,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   overscroll-behavior-x: contain;
-  padding-bottom: 8px;
+  scrollbar-width: none;           /* полоса прокрутки не нужна: виден край соседнего фото */
 }
 /* Ленте фотографий нужна та же остановка: без неё смах пролистывает
    половину галереи разом. */
