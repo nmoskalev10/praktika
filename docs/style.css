@@ -382,7 +382,10 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
      Половины ровно равные: 1fr и 1fr. Раньше правая колонка была
      шириной по содержимому, и панель выглядела перекошенной. */
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* minmax(0, ...), а не просто 1fr: обычный 1fr не даёт колонке стать
+     уже своего содержимого, и ряд кнопок раздвигал половину клавиатуры
+     за счёт половины со струнами. Сколько кнопок влезает, считает скрипт. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 16px;
   align-items: center;
   margin-top: 26px;
@@ -1289,7 +1292,16 @@ body.has-sticky { padding-bottom: 84px; }
   .formats__dots { display: none; }
 
   .format__head { flex-wrap: nowrap; }
-  .format__meta { grid-template-columns: repeat(3, 1fr); gap: 6px 24px; }
+  /* Подпись и значение идут в разметке подряд, а сетка раскладывала их
+     по ячейкам по очереди — пары разрывались и значение уезжало в чужую
+     колонку. Две строки и заполнение по столбцам держат пару вместе. */
+  .format__meta {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto auto;
+    grid-auto-flow: column;
+    gap: 6px 24px;
+    align-items: start;
+  }
 
   .about { grid-template-columns: 1.2fr 1fr; align-items: start; gap: 40px; }
   .credentials { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 20px; }
@@ -1310,7 +1322,7 @@ body.has-sticky { padding-bottom: 84px; }
   /* Места хватает — половины шире, но по-прежнему равные.
      Высоту струнам здесь не задаём: она должна остаться той же,
      что у клавиатуры, иначе половины разъедутся по вертикали. */
-  .duet { grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; margin-top: 28px; }
+  .duet { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: center; margin-top: 28px; }
   .hero__figure { margin: 0; }
   .hero__photo { aspect-ratio: 3 / 4; }
 
