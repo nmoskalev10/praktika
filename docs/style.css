@@ -45,6 +45,9 @@
   --accent: #a8231f;       /* русский красный с орнаментов: кнопки, ссылки, акцент */
   --accent-soft: #c9a227;  /* латунь струн: линии, узор, струны */
   --muted: #6b5644;        /* второстепенный текст */
+  /* Абзацы на тёмном фоне: светлая дека, чуть приглушённая.
+     Латунь оставлена мелким подписям — её мало, поэтому она и заметна. */
+  --on-ink: #e8dcc4;
 
   --wrap: 1120px;
   --gap: 20px;
@@ -151,12 +154,15 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 }
 
 .section { padding-block: 48px; }
-.section--paper { background: var(--white); }
+/* Раньше разделы чередовали два бежевых с контрастом 1.14 к 1 — глаз разницы
+   почти не видел, и граница выглядела ошибкой. Теперь светлая часть одного
+   цвета, разделы отбиваются воздухом и заголовками. */
+.section--paper { background: var(--paper); }
 .section--ink { background: var(--ink); color: var(--paper); }
 
 .section__title { font-size: clamp(26px, 7vw, 40px); }
 .section__intro { max-width: 62ch; color: var(--muted); }
-.section--ink .section__intro { color: var(--accent-soft); }
+.section--ink .section__intro { color: var(--on-ink); }
 .section__note { margin-top: 24px; font-size: 14px; color: var(--muted); }
 .section--ink .section__note { color: var(--accent-soft); }
 
@@ -239,38 +245,22 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
    половину кнопки — слабый отклик там просто не виден. */
 .btn:active { background: #6b1410; transform: translateY(0) scale(.94); }
 
-/* На тёмном фоне тёмно-красная кнопка сливается — выворачиваем наизнанку */
-.hero .btn--primary,
-.section--ink .btn--primary { background: var(--paper); color: var(--ink); }
-.hero .btn--primary:hover,
-.section--ink .btn--primary:hover { background: var(--white); }
-.hero .btn--primary:active,
-.section--ink .btn--primary:active { background: var(--accent-soft); color: var(--ink); }
+/* Главная кнопка красная везде, в том числе на тёмном фоне: красный на сайте
+   значит одно — «оставить заявку». Раньше на тёмных экранах она выворачивалась
+   в светлую, и одно и то же действие на одном экране было двух цветов. */
 
 .btn--compact { min-height: 44px; padding: 10px 18px; font-size: 15px; }
-
-/* Второстепенная кнопка первого экрана: своя заливка и своя обводка.
-   Раньше это была ссылка с подчёркиванием — рядом с крупной кнопкой
-   заявки она читалась как служебная строчка, а не как действие. */
-.btn--ghost {
-  background: rgba(201, 162, 39, .16);
-  border: 1.5px solid var(--accent-soft);
-  color: var(--paper);
-}
-.btn--ghost:hover { background: rgba(201, 162, 39, .3); }
-.btn--ghost:active {
-  background: var(--accent-soft);
-  color: var(--ink);
-  border-color: var(--accent-soft);
-}
 
 .btn--outline {
   background: transparent;
   border: 1.5px solid var(--accent-soft);
   color: var(--paper);
 }
-.btn--outline:hover { background: rgba(255, 255, 255, .1); }
-.btn--outline:active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-soft); }
+/* Второстепенная кнопка. Одна на весь сайт: «Смотреть видео», мессенджеры,
+   «Послушать» — всё она. На светлом фоне текст тёмный, на тёмном светлый. */
+.btn--outline:hover { background: rgba(201, 162, 39, .18); }
+.btn--outline:active { background: var(--accent-soft); color: var(--ink); border-color: var(--accent-soft); }
+.section:not(.section--ink) .btn--outline { color: var(--ink); }
 
 /* Подчёркивание не мигает, а выезжает сбоку: полоска растягивается
    от левого края через transform, поэтому вёрстка не пересчитывается. */
@@ -526,8 +516,8 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 /* Нажатая кнопка уходит вглубь корпуса */
 .keys__btn:active,
 .keys__btn.is-pressed {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
   transform: scale(.78);
 }
 
@@ -562,7 +552,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 .hero__subtitle {
   max-width: 46ch;
   font-size: 17px;
-  color: var(--accent-soft);
+  color: var(--on-ink);
   margin-bottom: 28px;
 }
 .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 22px; }
@@ -657,12 +647,12 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   transition: background-color 170ms ease, transform 170ms ease;
 }
 .formats__dot[aria-current="true"]::before {
-  background: var(--accent);
+  background: var(--ink);
   transform: scale(1.35);
 }
 /* Отклик на само нажатие: точка на миг становится крупнее и темнее */
 .formats__dot:active::before {
-  background: var(--accent);
+  background: var(--ink);
   transform: scale(1.6);
 }
 
@@ -682,7 +672,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 }
 .format__price {
   font-weight: 600;
-  color: var(--accent);
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -705,8 +695,18 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   font-weight: 400;
   margin: 0 0 10px;
   padding-top: 16px;
-  border-top: 4px solid var(--accent);
-  display: inline-block;
+  position: relative;
+}
+/* Планка одной длины у всех трёх: раньше она тянулась по ширине заголовка
+   и выходила то короткой, то длинной — выглядело случайно. */
+.rep__name::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: var(--accent-soft);
 }
 .rep__text { margin-bottom: 10px; }
 .rep__examples { font-size: 15px; color: var(--muted); margin: 0; }
@@ -720,25 +720,25 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   flex: 0 0 auto;
   min-height: 44px;
   padding: 10px 20px;
-  border: 1.5px solid var(--accent);
-  border-radius: 999px;
+  border: 1.5px solid var(--accent-soft);
+  border-radius: var(--radius);
   background: transparent;
-  color: var(--accent);
+  color: var(--ink);
   font-family: var(--font-text);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 170ms ease, color 170ms ease, border-color 170ms ease, transform 170ms ease;
 }
-.sample__btn:hover { background: var(--accent); color: var(--white); }
-.sample__btn:active { background: #6b1410; color: var(--white); border-color: #6b1410; transform: scale(.94); }
+.sample__btn:hover { background: rgba(201, 162, 39, .18); }
+.sample__btn:active { background: var(--accent-soft); color: var(--ink); transform: scale(.94); }
 .sample__btn[disabled] {
   border-color: var(--accent-soft);
   color: var(--muted);
   cursor: default;
 }
 .sample__btn[disabled]:hover { background: transparent; color: var(--muted); }
-.sample__btn[aria-pressed="true"] { background: var(--accent); color: var(--white); }
+.sample__btn[aria-pressed="true"] { background: var(--accent-soft); color: var(--ink); }
 
 .sample__track {
   flex: 1 1 auto;
@@ -750,7 +750,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 }
 .sample__bar {
   height: 100%;
-  background: var(--accent);
+  background: var(--ink);
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform 260ms linear;
@@ -760,7 +760,19 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 /* --- 10. Видео, аудио, фото ----------------------------------------------- */
 
 .video { margin-top: 24px; }
-.video-row { display: grid; gap: 16px; margin-top: 16px; }
+/* Короткие ролики на телефоне — лентой вбок, как фото: друг под другом
+   три обложки 16:9 занимали почти три экрана прокрутки. */
+.video-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.video-row::-webkit-scrollbar { width: 0; height: 0; }
+.video-row > * { flex: 0 0 82%; scroll-snap-align: start; scroll-snap-stop: always; }
 
 .video__btn {
   position: relative;
@@ -785,7 +797,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   display: grid; place-items: center;
   border-radius: 50%;
   background: var(--white);
-  color: var(--accent);
+  color: var(--ink);
   transition: transform 180ms ease;
 }
 .video__btn:hover .video__play { transform: scale(1.05); }
@@ -841,7 +853,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 
 .review {
   margin: 0;                       /* у blockquote есть свой отступ, он тут лишний */
-  border-left: 3px solid var(--accent);
+  border-left: 2px solid var(--accent-soft);
   padding-left: 18px;
 }
 .review__text { margin-bottom: 10px; }
@@ -850,18 +862,9 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 
 /* --- 12. О дуэте ---------------------------------------------------------- */
 
-/* Свет в зале гаснет: к концу страницы фон уходит из светлого в тёмный
-   и без стыка переходит в блок контактов. Это не анимация, а обычный
-   градиент — он ничего не стоит и работает даже при выключенном движении.
-   Нижний отступ нужен, чтобы тёмная часть пришлась на пустое место,
-   а не на текст. */
-#about {
-  padding-bottom: 220px;
-  /* Затемнение отмеряем от низа блока, а не в процентах: так оно всегда
-     приходится на пустой отступ и не ложится на текст и фотографию,
-     какой бы длины ни оказался текст. */
-  background: linear-gradient(to bottom, var(--paper) calc(100% - 220px), var(--ink) 100%);
-}
+/* Переход к тёмной части делает красная лента с ромбами сразу после
+   раздела. Раньше тут был ещё градиент из светлого в тёмный — он проходил
+   через серо-бурый и выглядел пятном. */
 
 .about { display: grid; gap: 28px; }
 .about__lead { font-size: 19px; }
@@ -1042,7 +1045,7 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 /* --- 13б. Врезка опросника на главной ------------------------------------- */
 
 .teaser { max-width: 46ch; }
-.teaser__text { color: var(--accent-soft); margin-bottom: 10px; }
+.teaser__text { color: var(--on-ink); margin-bottom: 10px; }
 .teaser__note { font-size: 14px; color: var(--muted); margin-bottom: 22px; }
 /* На тёмном фоне обычный приглушённый цвет не читается */
 .section--ink .teaser__note { color: #9b8a72; }
@@ -1143,9 +1146,9 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
 }
 .stepbar__buttons { display: flex; gap: 10px; flex: 1 1 100%; }
 .stepbar__buttons .btn { flex: 1 1 auto; }
-.stepbar .btn--outline { color: var(--accent); border-color: var(--accent); }
-.stepbar .btn--outline:hover { background: rgba(168, 35, 31, .1); }
-.stepbar .btn--outline:active { background: var(--accent); color: var(--white); }
+.stepbar .btn--outline { color: var(--ink); border-color: var(--accent-soft); }
+.stepbar .btn--outline:hover { background: rgba(201, 162, 39, .18); }
+.stepbar .btn--outline:active { background: var(--accent-soft); color: var(--ink); }
 
 @media (min-width: 700px) {
   .stepbar__sum { flex: 1 1 auto; font-size: 22px; }
@@ -1187,16 +1190,19 @@ h1, h2, h3 { margin: 0 0 .5em; font-family: var(--font-heading); font-weight: 40
   width: 52px;
   padding: 0;
   background: var(--paper);
-  color: var(--accent);
+  color: var(--ink);
   border: 1.5px solid var(--accent-soft);
 }
 .sticky .btn--icon:hover { background: var(--accent-soft); }
-.sticky .btn--icon:active { background: var(--accent); color: var(--white); border-color: var(--accent); }
+.sticky .btn--icon:active { background: var(--accent-soft); color: var(--ink); border-color: var(--accent-soft); }
 .sticky .btn--icon svg { width: 22px; height: 22px; }
 
 /* Пока панель видна, добавляем воздух внизу страницы,
    чтобы она не накрывала последний блок и фокус на нём. */
-body.has-sticky { padding-bottom: 84px; }
+/* Место под липкую кнопку держим внутри подвала: он тёмный. Раньше отступ
+   был у всей страницы, светлого цвета, и под тёмным подвалом торчала
+   бежевая полоса. */
+body.has-sticky .footer { padding-bottom: calc(32px + 84px); }
 
 /* --- 15a. Появление трёх секций при скролле -------------------------------
    Класс .ready ставится скриптом после загрузки разметки. Без скриптов
@@ -1264,7 +1270,8 @@ body.has-sticky { padding-bottom: 84px; }
   .hero__actions .btn { flex: 0 0 auto; }
   .hero__photo { aspect-ratio: 16 / 9; }
 
-  .video-row { grid-template-columns: 1fr 1fr; }
+  .video-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; overflow: visible; }
+  .video-row > * { flex: none; }
   .photos { display: grid; grid-template-columns: repeat(3, 1fr); overflow: visible; }
   .photos li { flex: none; }
 
@@ -1328,7 +1335,7 @@ body.has-sticky { padding-bottom: 84px; }
 
   /* Липкая панель нужна только там, где нет шапки под рукой */
   .sticky { display: none; }
-  body.has-sticky { padding-bottom: 0; }
+  body.has-sticky .footer { padding-bottom: 32px; }
 
   .form { max-width: 560px; }
 }
